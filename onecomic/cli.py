@@ -22,31 +22,11 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def parse_args():
-    """
-    根据腾讯漫画id下载图片,默认下载海贼王最新一集。
-
-    下载海贼王最新一集:
-    python onecomic.py
-
-    下载漫画 id=505430 最新一集:
-    python onecomic.py -id 505430
-
-    下载漫画 id=505430 所有章节:
-    python onecomic.py -id 505430 -m all
-
-    下载漫画 id=505430 第800集:
-    python onecomic.py -id 505430 -c 800
-
-    下载漫画 id=505430 倒数第二集:
-    python onecomic.py -id 505430 -c -2
-
-    下载漫画 id=505430 1到5集,7集，9到10集:
-    python onecomic.py -id 505430 -i 1-5,7,9-10
-    """
-
     parser = argparse.ArgumentParser(prog="onecomic", usage="""
-说明文档 https://onecomic-doc.readthedocs.io
+使用说明文档 https://onecomic-doc.readthedocs.io
 更新至最新版本 python -m pip install -U git+https://github.com/hardwarecode/onecomic
+更新至指定版本 python -m pip install -U git+https://github.com/hardwarecode/onecomic@v0.1.0
+沟通反馈 https://t.me/onecomicbook
 """)
 
     parser.add_argument('-id', '--comicid', type=str,
