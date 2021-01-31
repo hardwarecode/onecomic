@@ -44,7 +44,10 @@ def parse_args():
     python onecomic.py -id 505430 -i 1-5,7,9-10
     """
 
-    parser = argparse.ArgumentParser(prog="onecomic")
+    parser = argparse.ArgumentParser(prog="onecomic", usage="""
+说明文档 https://onecomic-doc.readthedocs.io
+更新至最新版本 python -m pip install -U git+https://github.com/hardwarecode/onecomic
+""")
 
     parser.add_argument('-id', '--comicid', type=str,
                         help="漫画id，如海贼王: 505430 (http://ac.qq.com/Comic/ComicInfo/id/505430)")
@@ -164,8 +167,9 @@ def download_main(comicbook, output_dir, ext_name=None, chapters=None,
     for chapter_number in chapter_numbers:
         try:
             chapter = comicbook.Chapter(chapter_number, ext_name=ext_name)
-            logger.info("正在下载 【{}】 {} 【{}】".format(
-                comicbook.name, chapter.chapter_number, chapter.title or chapter.chapter_number))
+            logger.info("正在下载 【{name}】 {chapter_number:>03} {title}".format(
+                name=comicbook.name, chapter_number=chapter.chapter_number, title=chapter.title)
+            )
 
             chapter_dir = chapter.save(output_dir=output_dir)
             chapter_dirs.append(chapter_dir)
@@ -298,13 +302,14 @@ def echo_comicbook_desc(comicbook, ext_name=None):
     last_chapter_number = comicbook.get_last_chapter_number(ext_name)
     last_chapter_title = comicbook.get_last_chapter_title(ext_name) or str(last_chapter_number)
     name = "{} {}".format(comicbook.name, ext_name) if ext_name else comicbook.name
-    msg = ("{source_name} 【{name}】 更新至: {last_chapter_number:>03} "
-           "【{last_chapter_title}】 数据来源: {source_url}").format(
+    msg = ("{source_name} comicid={comicid} 【{name}】 更新至: {last_chapter_number:>03} "
+           "{last_chapter_title} 数据来源: {source_url}").format(
         source_name=comicbook.source_name,
         name=name,
         last_chapter_number=last_chapter_number,
         last_chapter_title=last_chapter_title,
-        source_url=comicbook.source_url)
+        source_url=comicbook.source_url,
+        comicid=comicbook.comicid)
     logger.info(msg)
 
 
