@@ -16,7 +16,7 @@ from .exceptions import (
     ChapterNotFound
 )
 from .crawlerbase import CrawlerBase
-from .image import ImageDownloader
+from .image import get_image_downloader
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class ComicBook():
         url = comicid or crawler_cls.DEFAULT_COMICID
         comicid = self.get_comicid_by_url(site=site, url=url)
         self.crawler = crawler_cls(comicid)
-        self.image_downloader = ImageDownloader(site=site)
+        self.image_downloader = get_image_downloader(site=site)
 
         # {ext_name: {chapter_number: Chapter}}
         self.chapter_cache = defaultdict(dict)
@@ -254,11 +254,14 @@ class Chapter():
         chapter_dir = self.get_chapter_image_dir(output_dir)
         if self._saved is True:
             return chapter_dir
-        headers = {'Referer': self.comicbook.crawler.SITE_INDEX}
+
+        for headers in self.chapter_item.headers_list:
+            default_headers = {'Referer': self.comicbook.crawler.SITE_INDEX}
+            headers.update(default_headers)
         self.comicbook.image_downloader.download_images(
             image_urls=self.image_urls,
             output_dir=chapter_dir,
-            headers=headers,
+            headers_list=self.chapter_item.headers_list,
             image_pipelines=self.chapter_item.image_pipelines)
         self._saved = True
         return chapter_dir

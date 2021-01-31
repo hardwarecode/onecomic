@@ -100,7 +100,7 @@ class ChapterItem():
 
     def __init__(self, comicid, chapter_number, title, image_urls,
                  source_url=None, site=None, source_name=None,
-                 image_pipelines=None):
+                 image_pipelines=None, headers_list=None):
         self.chapter_number = chapter_number
         self.title = title or ""
         self.image_urls = image_urls or []
@@ -109,6 +109,7 @@ class ChapterItem():
         self.source_name = source_name or ""
         self.image_pipelines = image_pipelines
         self.comicid = comicid or ""
+        self.headers_list = headers_list or []
 
     def to_dict(self):
         return {field: getattr(self, field) for field in self.FIELDS}

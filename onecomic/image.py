@@ -52,7 +52,7 @@ class ImageDownloader(object):
         return SessionMgr.get_session(site=self.site)
 
     @retry(times=3, delay=1)
-    def download_image(self, image_url, target_path, image_pipeline=None, **kwargs):
+    def download_image(self, image_url, target_path, image_pipeline=None, headers=None, **kwargs):
         if os.path.exists(target_path):
             try:
                 self.verify_image(target_path)
@@ -61,6 +61,8 @@ class ImageDownloader(object):
                 pass
         try:
             session = self.get_session()
+            if headers:
+                session.headers.update(headers)
             response = session.get(image_url, timeout=self.timeout, **kwargs)
         except Exception as e:
             msg = "img download error: url=%s error: %s" % (image_url, e)
@@ -92,7 +94,7 @@ class ImageDownloader(object):
         with PIL.Image.open(image_path) as img:
             img.verify()
 
-    def download_images(self, image_urls, output_dir, image_pipelines=None, **kwargs):
+    def download_images(self, image_urls, output_dir, image_pipelines=None, headers_list=None, **kwargs):
         """下载出错只打印出警告信息，不抛出异常
         """
         pool = WorkerPoolMgr.get_pool()
@@ -100,15 +102,14 @@ class ImageDownloader(object):
         for idx, image_url in enumerate(image_urls, start=1):
             ext = self.find_suffix(image_url)
             target_path = os.path.join(output_dir.rstrip(), "{}.{}".format(idx, ext))
-            if image_pipelines:
-                image_pipeline = image_pipelines[idx - 1]
-            else:
-                image_pipeline = None
+            image_pipeline = image_pipelines[idx - 1] if image_pipelines else None
+            headers = headers_list[idx - 1] if headers_list else None
             future = pool.submit(
                 self.download_image,
                 image_url=image_url,
                 target_path=target_path,
                 image_pipeline=image_pipeline,
+                headers=headers,
                 **kwargs)
             future_list.append(future)
 
@@ -134,3 +135,13 @@ class ImageDownloader(object):
         if ext in allow:
             return ext
         return default
+
+
+IMAGE_DOWNLOADER_INSTANCE = {}
+
+
+def get_image_downloader(site):
+    global IMAGE_DOWNLOADER_INSTANCE
+    if site not in IMAGE_DOWNLOADER_INSTANCE:
+        IMAGE_DOWNLOADER_INSTANCE[site] = ImageDownloader(site)
+    return IMAGE_DOWNLOADER_INSTANCE[site]

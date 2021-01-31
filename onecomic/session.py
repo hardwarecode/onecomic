@@ -2,10 +2,16 @@ import json
 import pickle
 
 import requests
+from hyper.contrib import HTTP20Adapter
 
 from .utils import ensure_file_dir_exists
 
 requests.packages.urllib3.disable_warnings()
+
+HTTP_20_SITE = {
+    'qootoon': ['https://os1.52eyou.com']
+}
+
 
 
 class SessionMgr(object):
@@ -23,6 +29,9 @@ class SessionMgr(object):
             session.headers.update(cls.DEFAULT_HEADERS)
             session.verify = cls.DEFAULT_VERIFY
             cls.SESSION_INSTANCE[site] = session
+            if site in HTTP_20_SITE:
+                for url in HTTP_20_SITE[site]:
+                    session.mount(url, HTTP20Adapter())
         return cls.SESSION_INSTANCE[site]
 
     @classmethod
