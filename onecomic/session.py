@@ -9,7 +9,8 @@ from .utils import ensure_file_dir_exists
 requests.packages.urllib3.disable_warnings()
 
 HTTP_20_SITE = {
-    'qootoon': ['https://os1.52eyou.com']
+    'qootoon_image': ['https://os1.52eyou.com'],
+    'webtoons_image': ['https://webtoon-phinf.pstatic.net'],
 }
 
 

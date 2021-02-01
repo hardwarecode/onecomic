@@ -285,6 +285,13 @@ class CrawlerBase():
                 return r.group(1)
         return comicid_or_url
 
+    def get_image_headers_list(self, chapter):
+        headers_list = []
+        for image_url in chapter.image_urls:
+            headers = {'Referer': self.SITE_INDEX}
+            headers_list.append(headers)
+        return headers_list
+
     def get_comicbook_item(self):
         """
         :return ComicBookItem instance:

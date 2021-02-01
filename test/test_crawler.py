@@ -157,3 +157,11 @@ def test_toomics():
 
 def test_webtoons():
     _test_crawl_comicbook(site='webtoons', test_search=False)
+
+
+def test_pufei8():
+    _test_crawl_comicbook(site='pufei8', test_search=False)
+
+
+def test_qootoon():
+    _test_crawl_comicbook(site='qootoon', test_search=False)

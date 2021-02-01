@@ -75,7 +75,6 @@ class Acg456Crawler(CrawlerBase):
         )
         soup = self.get_soup(url)
         image_urls = []
-        headers_list = []
         container = soup.find('div', {'class': 'swiper-container'})
         if not container:
             raise ChapterNotFound.from_template(site=self.SITE,
@@ -85,30 +84,33 @@ class Acg456Crawler(CrawlerBase):
         for div in container.find_all('div', recursive=False):
             if div.img:
                 image_url = div.img.get('src')
-                headers = {
-                    ':authority': 'os1.52eyou.com',
-                    ':scheme': 'https',
-                    ':method': 'GET',
-                    ':path': image_url.replace('https://os1.52eyou.com', ''),
-                    'accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-                    'accept-encoding': 'gzip, deflate, br',
-                    'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
-                    'dnt': '1',
-                    'referer': 'https://www.qootoon.net/',
-                    'sec-ch-ua': '"Chromium";v="88", "Google Chrome";v="88", ";Not A Brand";v="99"',
-                    'sec-ch-ua-mobile': '?0',
-                    'sec-fetch-dest': 'image',
-                    'sec-fetch-mode': 'no-cors',
-                    'sec-fetch-site': 'cross-site',
-                }
                 image_urls.append(image_url)
-                headers_list.append(headers)
         return self.new_chapter_item(chapter_number=citem.chapter_number,
                                      title=citem.title,
                                      image_urls=image_urls,
-                                     source_url=citem.source_url,
-                                     headers_list=headers_list
-                                     )
+                                     source_url=citem.source_url)
+
+    def get_image_headers_list(self, chapter):
+        headers_list = []
+        for image_url in chapter.image_urls:
+            headers = {
+                ':authority': 'os1.52eyou.com',
+                ':scheme': 'https',
+                ':method': 'GET',
+                ':path': image_url.replace('https://os1.52eyou.com', ''),
+                'accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                'accept-encoding': 'gzip, deflate, br',
+                'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'dnt': '1',
+                'referer': 'https://www.qootoon.net/',
+                'sec-ch-ua': '"Chromium";v="88", "Google Chrome";v="88", ";Not A Brand";v="99"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-fetch-dest': 'image',
+                'sec-fetch-mode': 'no-cors',
+                'sec-fetch-site': 'cross-site',
+            }
+            headers_list.append(headers)
+        return headers_list
 
     def latest(self, page):
         if page >= 2:

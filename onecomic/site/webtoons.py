@@ -80,12 +80,35 @@ class WebtoonsCrawler(CrawlerBase):
         return book
 
     def get_chapter_item(self, citem):
-        soup = self.get_soup(citem.source_url)
+        headers = {'Referer': citem.source_url}
+        soup = self.get_soup(citem.source_url, headers=headers)
         image_urls = [img.get('data-url') for img in soup.find('div', {'id': '_imageList'}).find_all('img')]
         return self.new_chapter_item(chapter_number=citem.chapter_number,
                                      title=citem.title,
                                      image_urls=image_urls,
                                      source_url=citem.source_url)
+
+    def get_image_headers_list(self, chapter):
+        headers_list = []
+        for image_url in chapter.image_urls:
+            headers = {
+                ':authority': 'webtoon-phinf.pstatic.net',
+                ':scheme': 'https',
+                ':method': 'GET',
+                ':path': image_url.replace('https://webtoon-phinf.pstatic.net', ''),
+                'accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                'accept-encoding': 'gzip, deflate, br',
+                'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'dnt': '1',
+                'referer': chapter.source_url,
+                'sec-ch-ua': '"Chromium";v="88", "Google Chrome";v="88", ";Not A Brand";v="99"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-fetch-dest': 'image',
+                'sec-fetch-mode': 'no-cors',
+                'sec-fetch-site': 'cross-site',
+            }
+            headers_list.append(headers)
+        return headers_list
 
     def latest(self, page=1):
         if page >= 2:

@@ -254,14 +254,11 @@ class Chapter():
         chapter_dir = self.get_chapter_image_dir(output_dir)
         if self._saved is True:
             return chapter_dir
-
-        for headers in self.chapter_item.headers_list:
-            default_headers = {'Referer': self.comicbook.crawler.SITE_INDEX}
-            headers.update(default_headers)
+        headers_list = self.comicbook.crawler.get_image_headers_list(self)
         self.comicbook.image_downloader.download_images(
             image_urls=self.image_urls,
             output_dir=chapter_dir,
-            headers_list=self.chapter_item.headers_list,
+            headers_list=headers_list,
             image_pipelines=self.chapter_item.image_pipelines)
         self._saved = True
         return chapter_dir

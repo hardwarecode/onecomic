@@ -42,7 +42,7 @@ class ImageDownloader(object):
     URL_PATTERN = re.compile(r'^https?://.*')
 
     def __init__(self, site):
-        self.site = site
+        self.site = '%s_image' % site
         self.timeout = 30
 
     def set_timeout(self, timeout=30):
