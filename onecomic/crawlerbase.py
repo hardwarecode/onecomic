@@ -298,10 +298,17 @@ class CrawlerBase():
         """
         raise NotImplementedError
 
-    def get_chapter_item(self, chapter_number):
+    def get_chapter_item(self, citem):
         """
         :return ChapterItem instance:
         """
+        image_urls = self.get_chapter_image_urls(citem)
+        return self.new_chapter_item(chapter_number=citem.chapter_number,
+                                     title=citem.title,
+                                     image_urls=image_urls,
+                                     source_url=citem.source_url)
+
+    def get_chapter_image_urls(self, citem):
         raise NotImplementedError
 
     def new_comicbook_item(self, **kwargs):
