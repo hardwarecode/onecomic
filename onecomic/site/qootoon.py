@@ -73,7 +73,12 @@ class Acg456Crawler(CrawlerBase):
             self.SITE_INDEX,
             'https://www.qootoon.net/comic/episode_view?episode_idx=%s' % citem.episode
         )
-        soup = self.get_soup(url)
+        headers = {
+            'referer': 'https://www.qootoon.net/',
+            'sec-fetch-site': 'same-origin',
+        }
+        soup = self.get_soup(url, headers=headers)
+
         image_urls = []
         container = soup.find('div', {'class': 'swiper-container'})
         if not container:
