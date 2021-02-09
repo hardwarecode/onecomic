@@ -8,7 +8,7 @@ from ..exceptions import ChapterNotFound
 logger = logging.getLogger(__name__)
 
 
-class Acg456Crawler(CrawlerBase):
+class QootoonCrawler(CrawlerBase):
 
     SITE = "qootoon"
     SITE_INDEX = 'https://www.qootoon.net/'
