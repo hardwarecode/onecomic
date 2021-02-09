@@ -138,7 +138,7 @@ def download_main(comicbook, output_dir, ext_name=None, chapters=None,
                   is_single_image=None, quality=None, max_height=None, mail=None,
                   receivers=None, is_send_mail=None, merge=None, merge_zip=None,
                   crawler_delay=None):
-    is_gen_pdf = is_gen_pdf or mail
+    is_gen_pdf = is_gen_pdf or is_send_mail
     chapter_str = chapters or '-1'
     chapter_numbers = parser_chapter_str(chapter_str=chapter_str,
                                          last_chapter_number=comicbook.get_last_chapter_number(ext_name),
