@@ -21,11 +21,10 @@ logger = logging.getLogger(__name__)
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
-def parse_args():
+def get_parser():
     parser = argparse.ArgumentParser(prog="onecomic", usage="""
 使用说明文档 https://onecomic-doc.readthedocs.io
-更新至最新版本 python -m pip install -U onecomic
-更新至指定版本 python -m pip install -U onecomic==0.1.1
+更新至最新版本 pip install -U onecomic
 交流群 https://t.me/onecomicbook
 """)
 
@@ -115,8 +114,7 @@ def parse_args():
     parser.add_argument('-V', '--version', action='version', version=VERSION)
     parser.add_argument('--debug', action='store_true', help="debug")
 
-    args = parser.parse_args()
-    return args
+    return parser
 
 
 def init_logger(debug=False):
@@ -318,7 +316,8 @@ def save_cookies(site, config):
 
 
 def main():
-    args = parse_args()
+    parser = get_parser()
+    args = parser.parse_args()
     init_logger(debug=args.debug)
     config = CrawlerConfig(args=args)
 
@@ -327,9 +326,12 @@ def main():
         if not site:
             raise RuntimeError('Unknown url. url=%s' % args.url)
         comicid = ComicBook.get_comicid_by_url(site=site, url=args.url)
-    else:
-        site = args.site or 'qq'
+    elif args.site:
+        site = args.site
         comicid = args.comicid
+    else:
+        parser.print_help()
+        exit(1)
 
     WorkerPoolMgr.set_worker(worker=config.worker)
     CrawlerBase.DRIVER_PATH = config.driver_path

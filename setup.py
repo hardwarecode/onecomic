@@ -124,4 +124,5 @@ setup(
     cmdclass={
         'upload': UploadCommand,
     },
+    scripts=['bin/onecomic']
 )
