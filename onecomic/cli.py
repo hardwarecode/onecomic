@@ -24,9 +24,9 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 def parse_args():
     parser = argparse.ArgumentParser(prog="onecomic", usage="""
 使用说明文档 https://onecomic-doc.readthedocs.io
-更新至最新版本 python -m pip install -U git+https://github.com/hardwarecode/onecomic
-更新至指定版本 python -m pip install -U git+https://github.com/hardwarecode/onecomic@v0.1.0
-沟通反馈 https://t.me/onecomicbook
+更新至最新版本 python -m pip install -U onecomic
+更新至指定版本 python -m pip install -U onecomic==0.1.1
+交流群 https://t.me/onecomicbook
 """)
 
     parser.add_argument('-id', '--comicid', type=str,
