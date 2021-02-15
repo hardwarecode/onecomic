@@ -319,7 +319,6 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     init_logger(debug=args.debug)
-    config = CrawlerConfig(args=args)
 
     if args.url:
         site = ComicBook.get_site_by_url(args.url)
@@ -332,7 +331,7 @@ def main():
     else:
         parser.print_help()
         exit(1)
-
+    config = CrawlerConfig(args=args)
     WorkerPoolMgr.set_worker(worker=config.worker)
     CrawlerBase.DRIVER_PATH = config.driver_path
     logger.debug('set DRIVER_PATH. DRIVER_PATH=%s', config.driver_path)
