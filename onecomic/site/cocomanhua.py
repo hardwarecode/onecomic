@@ -89,9 +89,7 @@ class CocomanhuaCrawler(CrawlerBase):
                                      image_urls=image_urls,
                                      source_url=citem.source_url)
 
-    def latest(self, page=1):
-        url = "https://www.cocomanhua.com/show?orderBy=update&page=%s" % page
-        soup = self.get_soup(url)
+    def get_book_by_page(self, soup):
         result = self.new_search_result_item()
         for li in soup.find('ul', {'class': 'fed-list-info fed-part-rows'}).find_all('li'):
             href = li.a.get('href')
@@ -104,6 +102,30 @@ class CocomanhuaCrawler(CrawlerBase):
                               cover_image_url=cover_image_url,
                               source_url=source_url)
         return result
+
+    def latest(self, page=1):
+        url = "https://www.cocomanhua.com/show?orderBy=update&page=%s" % page
+        soup = self.get_soup(url)
+        return self.get_book_by_page(soup)
+
+    def get_tags(self):
+        url = "https://www.cocomanhua.com/show?orderBy=update"
+        soup = self.get_soup(url)
+        dl = soup.find("div", {"class": 'fed-casc-list fed-part-rows'}).find_all('dl')[1]
+        tags = self.new_tags_item()
+        for dd in dl.find_all('dd'):
+            href = dd.a.get('href')
+            tag_name = dd.a.text.strip()
+            r = re.search(r'mainCategoryId=(\d+)', href)
+            if r:
+                tag_id = r.group(1)
+                tags.add_tag(category='分类', tag=tag_id, name=tag_name)
+        return tags
+
+    def get_tag_result(self, tag, page):
+        url = 'https://www.cocomanhua.com/show?mainCategoryId=%s&orderBy=update&page=%s' % (tag, page)
+        soup = self.get_soup(url)
+        return self.get_book_by_page(soup)
 
     def search(self, name, page, size=None):
         url = "https://www.cocomanhua.com/search?searchString=%s&page=%s" % (name, page)

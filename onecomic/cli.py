@@ -93,7 +93,7 @@ def get_parser():
 
     parser.add_argument('--show-tags', action='store_true', help="展示当前支持的标签")
     parser.add_argument('--tag-all', action='store_true', help="下载标签里的所有漫画")
-    parser.add_argument('--tag', type=str, help="标签id")
+    parser.add_argument('--tag', type=str, help="标签id或标签名")
     parser.add_argument('--tag-page', type=str, help="标签页数，如1-10，默认第1页")
 
     parser.add_argument('--search-all', action='store_true', help="下载搜索结果的所有漫画")
@@ -269,8 +269,7 @@ def show_tags(comicbook):
         category = t1['category']
         t1_msg_list = []
         for t2 in t1['tags']:
-            msg = '{name}={tag}'.format(name=t2['name'], tag=t2['tag'])
-            t1_msg_list.append(msg)
+            t1_msg_list.append(t2['name'])
         msg = '{}:\n{}'.format(category, '\t'.join(t1_msg_list))
         msg_list.append(msg)
     logger.info('支持的标签\n%s', '\n'.join(msg_list))
