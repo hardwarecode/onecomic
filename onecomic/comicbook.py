@@ -303,6 +303,6 @@ class Chapter():
         chapter_dir = self.save(output_dir)
         zipfile_path = self.get_zipfile_path(output_dir)
         if os.path.exists(zipfile_path) and not self.images_has_modify(chapter_dir):
-            return output_dir
+            return zipfile_path
         ensure_file_dir_exists(filepath=zipfile_path)
         return image_dir_to_zipfile(chapter_dir, zipfile_path)
