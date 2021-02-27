@@ -19,6 +19,7 @@ class Mh1234Crawler(CrawlerBase):
     DEFAULT_SEARCH_NAME = '斗罗大陆'
     DEFAULT_TAG = "1"
     COMICID_PATTERN = re.compile(r'/comic/(\d+)\.html')
+    SITE_ENCODEING = 'utf-8'
 
     @property
     def source_url(self):
