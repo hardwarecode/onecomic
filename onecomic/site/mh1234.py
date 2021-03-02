@@ -44,7 +44,7 @@ class Mh1234Crawler(CrawlerBase):
                                        author=author,
                                        source_url=self.source_url)
         li_list = soup.find('ul', {'id': 'chapter-list-1'}).find_all('li')
-        for chapter_number, li in enumerate(reversed(li_list), start=1):
+        for chapter_number, li in enumerate(li_list, start=1):
             href = li.a.get('href')
             url = urljoin(self.SITE_INDEX, href)
             title = li.a.text.strip()
