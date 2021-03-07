@@ -33,16 +33,21 @@ class Mh1234Crawler(CrawlerBase):
 
         name = soup.h1.text.strip()
         author = ''
+        last_update_time = ''
         for p in soup.find('div', {'class': 'info'}).find_all('p'):
             if '原著作者：' in p.text:
                 author = p.text.replace('原著作者：', '').strip()
+            elif '更新时间：' in p.text:
+                last_update_time = p.text.replace('更新时间：', '').strip()
+
         desc = soup.find('div', {'class': 'introduction'}).p.text
         cover_image_url = soup.find('p', {'class': 'cover'}).img.get('src')
         book = self.new_comicbook_item(name=name,
                                        desc=desc,
                                        cover_image_url=cover_image_url,
                                        author=author,
-                                       source_url=self.source_url)
+                                       source_url=self.source_url,
+                                       last_update_time=last_update_time)
         li_list = soup.find('ul', {'id': 'chapter-list-1'}).find_all('li')
         for chapter_number, li in enumerate(li_list, start=1):
             href = li.a.get('href')
