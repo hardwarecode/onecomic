@@ -12,7 +12,7 @@ class QootoonCrawler(CrawlerBase):
 
     SITE = "qootoon"
     SITE_INDEX = 'https://www.qootoon.net/'
-    SOURCE_NAME = "TOPTOON"
+    SOURCE_NAME = "qootoon"
     LOGIN_URL = SITE_INDEX
     COMICID_PATTERN = re.compile(r'/\#contents_\d+')
     DEFAULT_COMICID = '107'

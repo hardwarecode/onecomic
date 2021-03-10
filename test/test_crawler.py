@@ -165,3 +165,7 @@ def test_pufei8():
 
 def test_qootoon():
     _test_crawl_comicbook(site='qootoon', test_search=False)
+
+
+def test_yymh889():
+    _test_crawl_comicbook(site='yymh889', test_search=False)
