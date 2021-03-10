@@ -70,7 +70,7 @@ class DmzjCrawler(CrawlerBase):
                              title=title)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         s = re.search(r'(eval\(function.*)', html).group(1)
         js_str = jsbeautifier.beautify(s)
@@ -81,10 +81,7 @@ class DmzjCrawler(CrawlerBase):
         for url in data['page_url'].split('\n'):
             image_url = urljoin(image_prefix, quote(url.strip()))
             image_urls.append(image_url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         if page == 1:

@@ -58,7 +58,7 @@ class Mh1234Crawler(CrawlerBase):
                              title=title)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         chapterImages = re.search(r'var chapterImages = \[(.*?)\];', html).group(1)
         chapterPath = re.search(r'var chapterPath = "(.*?)";', html).group(1)
@@ -66,10 +66,7 @@ class Mh1234Crawler(CrawlerBase):
         for url in chapterImages.split(','):
             image_url = urljoin("https://img.wszwhg.net", chapterPath + url.strip('"'))
             image_urls.append(image_url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         if page > 1:

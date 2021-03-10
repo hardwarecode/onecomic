@@ -68,7 +68,7 @@ class KuaiKanCrawler(CrawlerBase):
     def get_chapter_soure_url(self, cid):
         return urljoin(self.SITE_INDEX, "/web/comic/{}/".format(cid))
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         data = self.parse_api_data_from_page(html)
         if not data:
@@ -77,10 +77,7 @@ class KuaiKanCrawler(CrawlerBase):
                                                 chapter_number=citem.chapter_number,
                                                 source_url=self.source_url)
         image_urls = [i['url'] for i in data['comicInfo']['comicImages']]
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def search(self, name, page=1, size=None):
         if page != 1:

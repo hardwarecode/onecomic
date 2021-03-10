@@ -83,7 +83,7 @@ class C2animxCrawler(CrawlerBase):
     def get_image_url_from_page(self, soup):
         return soup.find('img', {'id': 'ComicPic'}).get('src')
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         soup = self.get_soup(citem.source_url)
         max_page = self.get_chapter_max_page(soup)
         image_urls = [self.get_image_url_from_page(soup)]
@@ -99,10 +99,7 @@ class C2animxCrawler(CrawlerBase):
         result_list = concurrent_run(zip_args)
         for result in result_list:
             image_urls.append(result)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         if page > 1:

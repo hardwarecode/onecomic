@@ -85,11 +85,9 @@ class C18comicCrawler(CrawlerBase):
                 image_pipelines.append(self.image_pipeline)
 
             image_urls.append(url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     image_pipelines=image_pipelines,
-                                     source_url=citem.source_url)
+        citem.image_pipelines = image_pipelines
+        citem.image_urls = image_urls
+        return citem
 
     def image_pipeline(self, image_path):
         img = Image.open(image_path)

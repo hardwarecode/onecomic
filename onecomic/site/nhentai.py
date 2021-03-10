@@ -59,14 +59,11 @@ class NhentaiCrawler(CrawlerBase):
                              cid=self.comicid,
                              source_url=self.source_url,
                              image_urls=image_urls,
-                             title=str(chapter_number))
+                             title='')
         return book
 
-    def get_chapter_item(self, citem):
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title='',
-                                     image_urls=citem.image_urls,
-                                     source_url=citem.source_url)
+    def get_chapter_image_urls(self, citem):
+        return citem
 
     def search(self, name, page=1, size=None):
         url = urljoin(

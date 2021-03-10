@@ -65,7 +65,7 @@ class ManhuataiCrawler(CrawlerBase):
             )
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         params = {
             'product_id': 2,
             'productname': 'mht',
@@ -82,10 +82,7 @@ class ManhuataiCrawler(CrawlerBase):
         for i in range(1, total + 1):
             url = prefix + rule.replace('$$', str(i)) + '-mht.middle.webp'
             image_urls.append(url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         if page > 1:

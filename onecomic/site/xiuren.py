@@ -43,7 +43,7 @@ class NvshensCrawler(CrawlerBase):
                                        cover_image_url=image_urls[0],
                                        author=author,
                                        source_url=self.source_url)
-        book.add_chapter(chapter_number=1, source_url=self.source_url, title=name,
+        book.add_chapter(chapter_number=1, source_url=self.source_url, title='',
                          image_urls=image_urls)
         for a in soup.find('div', {'class': 'date'}).find_all('a'):
             href = a.get('href')
@@ -53,10 +53,7 @@ class NvshensCrawler(CrawlerBase):
         return book
 
     def get_chapter_item(self, citem):
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title='',
-                                     image_urls=citem.image_urls,
-                                     source_url=citem.source_url)
+        return citem
 
     def parse_book_list(self, soup):
         result = self.new_search_result_item()

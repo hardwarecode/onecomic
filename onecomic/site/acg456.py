@@ -65,17 +65,14 @@ class Acg456Crawler(CrawlerBase):
             book.add_tag(name=tag_name, tag=tag_id)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         cid = re.search(r'var c = (\d+);', html).group(1)
         api_url = 'http://www.acg456.com/ajax/Common.ashx'
         params = dict(op='getPics', cid=cid, path=citem.cid, _=int(time.time()))
         data = self.get_json(api_url, params=params)
         image_urls = data['data']
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         if page > 1:

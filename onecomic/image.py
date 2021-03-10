@@ -40,6 +40,7 @@ def walk(rootdir):
 
 class ImageDownloader(object):
     URL_PATTERN = re.compile(r'^https?://.*')
+    SITE = ''
 
     def __init__(self, site):
         self.site = '%s_image' % site
@@ -51,19 +52,24 @@ class ImageDownloader(object):
     def get_session(self):
         return SessionMgr.get_session(site=self.site)
 
-    @retry(times=3, delay=1)
-    def download_image(self, image_url, target_path, image_pipeline=None, headers=None, **kwargs):
-        if os.path.exists(target_path):
+    def is_image_exists(self, image_path):
+        if os.path.exists(image_path):
             try:
-                self.verify_image(target_path)
-                return target_path
+                self.verify_image(image_path)
+                return True
             except Exception:
                 pass
+        return False
+
+    @retry(times=3, delay=1)
+    def download_image(self, image_url, target_path, image_pipeline=None, headers=None, **kwargs):
+        if self.is_image_exists(target_path):
+            return target_path
+        session = self.get_session()
+        headers = dict(session.headers, **(headers or {}))
+
         try:
-            session = self.get_session()
-            if headers:
-                session.headers.update(headers)
-            response = session.get(image_url, timeout=self.timeout, **kwargs)
+            response = session.get(image_url, timeout=self.timeout, headers=headers, **kwargs)
         except Exception as e:
             msg = "img download error: url=%s error: %s" % (image_url, e)
             raise ImageDownloadError(msg) from e
@@ -135,13 +141,3 @@ class ImageDownloader(object):
         if ext in allow:
             return ext
         return default
-
-
-IMAGE_DOWNLOADER_INSTANCE = {}
-
-
-def get_image_downloader(site):
-    global IMAGE_DOWNLOADER_INSTANCE
-    if site not in IMAGE_DOWNLOADER_INSTANCE:
-        IMAGE_DOWNLOADER_INSTANCE[site] = ImageDownloader(site)
-    return IMAGE_DOWNLOADER_INSTANCE[site]

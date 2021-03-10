@@ -67,15 +67,12 @@ class Tuhao456Crawler(CrawlerBase):
                              title=title)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         js_str = re.search(r'var pages = (\{.*?\});', html).group(1)
         data = json.loads(js_str)
         image_urls = [url for url in data['page_url'].split('|') if re.search('https?://.*', url)]
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         if page > 1:

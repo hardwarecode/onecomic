@@ -54,14 +54,11 @@ class C55comicCrawler(CrawlerBase):
             book.add_tag(tag=tag_name, name=tag_name)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         soup = self.get_soup(citem.source_url)
         image_urls = [img.get('data-original')
                       for img in soup.find('div', {'class': 'comicpage'}).find_all('img')]
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         soup = self.get_soup(self.SITE_INDEX)

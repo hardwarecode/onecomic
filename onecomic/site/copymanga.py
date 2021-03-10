@@ -81,15 +81,12 @@ class CopymangaCrawler(CrawlerBase):
                              uuid=uuid)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         api_url = "https://api.copymanga.com/api/v3/comic/%s/chapter/%s?platform=1&_update=true"
         url = api_url % (self.comicid, citem.uuid)
         data = self.get_json(url)
         image_urls = [i['url'] for i in data['results']['chapter']['contents']]
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def get_chapter_from_page(self, soup):
         result = self.new_search_result_item()

@@ -36,7 +36,7 @@ class ComicBookItem():
         self.last_update_time = last_update_time or ""
         self.default_ext_name = default_ext_name
 
-        # {'番外篇': {1: Citem(chapter_number=1, title="xx", cid="xxx"}}
+        # {'番外篇': {1: ChapterItem(chapter_number=1, title="xx", cid="xxx"}}
         self.citems = defaultdict(dict)
         self.tags = []
 
@@ -54,8 +54,8 @@ class ComicBookItem():
 
     def add_chapter(self, chapter_number, title, source_url, ext_name=None, **kwargs):
         ext_name = ext_name or ''
-        self.citems[ext_name][chapter_number] = Citem(
-            chapter_number=chapter_number, title=title, source_url=source_url, **kwargs)
+        self.citems[ext_name][chapter_number] = ChapterItem(
+            chapter_number=chapter_number, title=title, source_url=source_url, comicid=self.comicid, **kwargs)
 
     def citems_to_list(self, citems):
         rv = []
@@ -84,7 +84,7 @@ class ComicBookItem():
         return ret
 
 
-class Citem():
+class CItem(object):
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -95,27 +95,31 @@ class Citem():
         return self._kwargs
 
 
-class ChapterItem():
+class ChapterItem(object):
+
     FIELDS = ["comicid", "chapter_number", "title", "image_urls", "source_url", "site", "source_name"]
 
-    def __init__(self, comicid, chapter_number, title, image_urls,
+    def __init__(self, comicid, chapter_number, title, image_urls=None,
                  source_url=None, site=None, source_name=None,
-                 image_pipelines=None, headers_list=None):
+                 image_pipelines=None, headers_list=None, **kwargs):
         self.chapter_number = chapter_number
         self.title = title or ""
-        self.image_urls = image_urls or []
+        self.image_urls = image_urls
         self.source_url = source_url or ""
         self.site = site or ""
         self.source_name = source_name or ""
         self.image_pipelines = image_pipelines
         self.comicid = comicid or ""
         self.headers_list = headers_list or []
+        self._kwargs = kwargs
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
     def to_dict(self):
         return {field: getattr(self, field) for field in self.FIELDS}
 
 
-class SearchResultItem():
+class SearchResultItem(object):
     FIELDS = ["comicid", "name", "cover_image_url", "source_url", "status", "site", "source_name"]
 
     def __init__(self, site=None, source_name=None):
@@ -125,7 +129,7 @@ class SearchResultItem():
 
     def add_result(self, comicid, name, cover_image_url, source_url, status=None):
         status = status or ""
-        item = Citem(comicid=comicid, name=name,
+        item = CItem(comicid=comicid, name=name,
                      cover_image_url=cover_image_url, source_url=source_url,
                      status=status, site=self.site, source_name=self.source_name)
         self._result.append(item)
@@ -140,7 +144,7 @@ class SearchResultItem():
         return [i.to_dict() for i in self._result]
 
 
-class TagsItem():
+class TagsItem(object):
 
     def __init__(self):
         self.tags = []
@@ -163,7 +167,7 @@ class TagsItem():
         return iter(self.tags)
 
 
-class CrawlerBase():
+class CrawlerBase(object):
 
     # 站点名字
     SOURCE_NAME = "未知"
@@ -303,10 +307,8 @@ class CrawlerBase():
         :return ChapterItem instance:
         """
         image_urls = self.get_chapter_image_urls(citem)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        citem.image_urls = image_urls
+        return citem
 
     def get_chapter_image_urls(self, citem):
         raise NotImplementedError

@@ -71,7 +71,7 @@ class ManhuadbCrawler(CrawlerBase):
 
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         s = re.search(r"<script>var img_data = '(.*?)';</script>", html).group(1)
         data = json.loads(base64.b64decode(s.encode()).decode())
@@ -82,10 +82,7 @@ class ManhuadbCrawler(CrawlerBase):
             uri = item.get('img_webp') or item.get('img')
             image_url = '%s/%s/%s' % (prefix, url_part, uri)
             image_urls.append(image_url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         if page == 1:

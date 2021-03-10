@@ -79,14 +79,11 @@ class WebtoonsCrawler(CrawlerBase):
                 title=c['title'])
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         headers = {'Referer': citem.source_url}
         soup = self.get_soup(citem.source_url, headers=headers)
         image_urls = [img.get('data-url') for img in soup.find('div', {'id': '_imageList'}).find_all('img')]
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def get_image_headers_list(self, chapter):
         headers_list = []

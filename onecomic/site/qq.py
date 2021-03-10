@@ -68,12 +68,8 @@ class QQCrawler(CrawlerBase):
             book.add_chapter(chapter_number=chapter_number, title=title, source_url=chapter_page_url)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         chapter_page_html = self.get_html(citem.source_url)
-        chapter_item = self.parser_chapter_page(chapter_page_html, source_url=citem.source_url)
-        return chapter_item
-
-    def parser_chapter_page(self, chapter_page_html, source_url=None):
         # 该方法只能解出部分数据，会缺失前面的一部分json字符串
         bs64_data = re.search(r"var DATA\s*=\s*'(.*?)'", chapter_page_html).group(1)
         for i in range(len(bs64_data)):
@@ -84,16 +80,12 @@ class QQCrawler(CrawlerBase):
                 pass
         else:
             raise
-
         json_str = "{" + self.CHAPTER_JSON_STR_PATTERN.search(json_str_part).group(1)
         data = json.loads(json_str)
-        title = data["chapter"]["cTitle"]
-        chapter_number = data["chapter"]["cSeq"]
+        # title = data["chapter"]["cTitle"]
+        # chapter_number = data["chapter"]["cSeq"]
         image_urls = [item['url'] for item in data["picture"]]
-        return self.new_chapter_item(chapter_number=chapter_number,
-                                     title=title,
-                                     image_urls=image_urls,
-                                     source_url=source_url)
+        return image_urls
 
     def search(self, name, page=1, size=None):
         url = "https://ac.qq.com/Comic/searchList/search/{}/page/{}".format(name, page)

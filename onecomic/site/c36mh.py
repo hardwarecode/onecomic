@@ -68,7 +68,7 @@ class C36mhCrawler(CrawlerBase):
                              title=title)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         chapterPath = re.search(r'var chapterPath = "(.*?)";', html).group(1)
         chapterImages = re.search(r'var chapterImages = (\[.*?\]);', html).group(1)
@@ -78,10 +78,7 @@ class C36mhCrawler(CrawlerBase):
         for i in json.loads(chapterImages):
             image_url = prefix + chapterPath + i
             image_urls.append(image_url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         url = urljoin(self.SITE_INDEX, "/update/%s/" % page)

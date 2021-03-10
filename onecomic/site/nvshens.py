@@ -39,7 +39,7 @@ class NvshensCrawler(CrawlerBase):
                                        author=author,
                                        source_url=self.source_url)
         max_page = self.get_book_max_page(soup)
-        book.add_chapter(chapter_number=1, source_url=self.source_url, title=name,
+        book.add_chapter(chapter_number=1, source_url=self.source_url, title='',
                          page1_image_urls=page1_image_urls, max_page=max_page)
         return book
 
@@ -58,7 +58,7 @@ class NvshensCrawler(CrawlerBase):
         return [img.get('src') for img in
                 soup.find('ul', {'id': 'hgallery'}).find_all('img')]
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         added_pages = set()
         max_page = citem.max_page
         image_urls = [i for i in citem.page1_image_urls]
@@ -87,10 +87,7 @@ class NvshensCrawler(CrawlerBase):
                 if mpage > max_page:
                     max_page = mpage
                 image_urls.extend(urls)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title='',
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def parse_book_list(self, soup):
         result = self.new_search_result_item()

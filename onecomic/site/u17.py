@@ -66,18 +66,15 @@ class U17Crawler(CrawlerBase):
                              source_url=chapter_url, chapter_id=chapter_id)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         chapter_id = citem.chapter_id
         chapter_api_url = self.CHAPTER_API.format(chapter_id=chapter_id)
         data = self.get_json(chapter_api_url)
-        title = data["chapter"]["name"]
+        # title = data["chapter"]["name"]
         image_urls = []
         for item in data["image_list"]:
             image_urls.append(item['src'])
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def search(self, name, page=1, size=None):
         url = "http://so.u17.com/all/{}/m0_p{}.html".format(urllib.parse.quote(name), page)

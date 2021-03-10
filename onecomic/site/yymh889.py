@@ -2,8 +2,11 @@ import re
 import logging
 from urllib.parse import urljoin
 
+from PIL import Image
 
 from ..crawlerbase import CrawlerBase
+from ..image import ImageDownloader, retry, ImageDownloadError
+from ..utils import ensure_file_dir_exists
 
 logger = logging.getLogger(__name__)
 
@@ -70,19 +73,22 @@ class Yymh889Crawler(CrawlerBase):
             url = urljoin(self.SITE_INDEX, "/home/book/capter/id/{}".format(item['id']))
             title = item['title']
             imagelist = item.get('imagelist')
-            image_urls = imagelist.split(',') if imagelist else []
+            image_urls = []
+            need_patch = False
+            if imagelist:
+                for url in imagelist.split(','):
+                    if url:
+                        image_urls.append(url)
             book.add_chapter(chapter_number=chapter_number,
                              source_url=url,
                              title=title,
-                             image_urls=image_urls)
+                             image_urls=image_urls,
+                             need_patch=need_patch)
             chapter_number += 1
         return book
 
     def get_chapter_item(self, citem):
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=citem.image_urls,
-                                     source_url=citem.source_url)
+        return citem
 
     def latest(self, page=1):
         url = urljoin(self.SITE_INDEX, '/home/api/getpagex/tp/0-isnew-{}'.format(page))
@@ -113,3 +119,54 @@ class Yymh889Crawler(CrawlerBase):
                               cover_image_url=cover_image_url,
                               source_url=source_url)
         return result
+
+
+class Yymh889ImageDownloader(ImageDownloader):
+    SITE = Yymh889Crawler.SITE
+
+    @retry(times=3, delay=1)
+    def download_image(self, image_url, target_path, image_pipeline=None, headers=None, **kwargs):
+        if self.is_image_exists(target_path):
+            return target_path
+        session = self.get_session()
+        headers = dict(session.headers, **(headers or {}))
+        img_list = []
+        for image_url in image_url.split('||||'):
+            try:
+                response = session.get(image_url, timeout=self.timeout, headers=headers, stream=True, **kwargs)
+            except Exception as e:
+                msg = "img download error: url=%s error: %s" % (image_url, e)
+                raise ImageDownloadError(msg) from e
+
+            if response.status_code != 200:
+                msg = 'img download error: url=%s status_code=%s' % (image_url, response.status_code)
+                raise ImageDownloadError(msg)
+
+            img = Image.open(response.raw)
+            img_list.append(img)
+        new_img = self.merge_to_one_image(img_list)
+
+        ensure_file_dir_exists(target_path)
+        new_img.save(target_path, quality=95)
+        return target_path
+
+    def merge_to_one_image(self, img_list):
+        # 将图片列表拼接成1张
+        if len(img_list) == 1:
+            return img_list[0]
+
+        new_width = 0
+        new_height = 0
+        for img in img_list:
+            width, height = img.size
+            new_height = height
+            new_width += width
+        new_img = Image.new(img_list[0].mode, (new_width, new_height))
+
+        w_start = 0
+        for img in img_list:
+            width, height = img.size
+            box = (w_start, 0, w_start + width, new_height)
+            new_img.paste(img, box=box)
+            w_start += width
+        return new_img

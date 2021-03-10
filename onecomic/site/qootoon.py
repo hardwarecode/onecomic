@@ -68,7 +68,7 @@ class QootoonCrawler(CrawlerBase):
             idx += 1
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         url = urljoin(
             self.SITE_INDEX,
             'https://www.qootoon.net/comic/episode_view?episode_idx=%s' % citem.episode
@@ -90,10 +90,7 @@ class QootoonCrawler(CrawlerBase):
             if div.img:
                 image_url = div.img.get('src')
                 image_urls.append(image_url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def get_image_headers_list(self, chapter):
         headers_list = []

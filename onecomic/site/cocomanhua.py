@@ -56,19 +56,16 @@ class CocomanhuaCrawler(CrawlerBase):
                              title=title)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         # https://github.com/Amd794/kanleying
         html = self.get_html(citem.source_url)
         data = re.search('var C_DATA.*?\'(.*?)\'', html).group(1)
         js_content = open(self.COCOMANHUA_JS_PATH, encoding='utf-8').read()
         ctx = execjs.get().compile(js_content, cwd=self.NODE_MODULES)
         image_urls = ctx.eval(f'getArr("{data}")')
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
-    def _get_chapter_item(self, citem):
+    def _get_chapter_image_urls(self, citem):
         driver = self.create_driver()
         driver.get(citem.source_url)
         total_image = 0
@@ -84,10 +81,7 @@ class CocomanhuaCrawler(CrawlerBase):
             url = driver.execute_script("return __cr.getPicUrl(%s + 1);" % index)
             url = 'https:' + url
             image_urls.append(url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def get_book_by_page(self, soup):
         result = self.new_search_result_item()

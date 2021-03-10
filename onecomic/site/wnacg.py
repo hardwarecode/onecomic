@@ -43,14 +43,14 @@ class WnacgCrawler(CrawlerBase):
                                        source_url=self.source_url)
         chapter_number = 1
         url = urljoin(self.SITE_INDEX, '/photos-slide-aid-{}.html'.format(self.comicid))
-        book.add_chapter(chapter_number=chapter_number, cid=self.comicid, source_url=url, title=str(chapter_number))
+        book.add_chapter(chapter_number=chapter_number, cid=self.comicid, source_url=url, title='')
         tag_list = [i.text for i in soup.find('div', {'class': 'addtags'}).find_all('a', {'class': 'tagshow'})]
         for tag_name in tag_list:
             tag_id = self.get_tag_id_by_name(tag_name)
             book.add_tag(name=tag_name, tag=tag_id)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         api_url = urljoin(self.SITE_INDEX, "/photos-gallery-aid-{}.html".format(citem.cid))
         html = self.get_html(api_url)
         img_list = re.findall(r'url: fast_img_host\+\\"(.*?)\\".*?}', html)
@@ -62,11 +62,7 @@ class WnacgCrawler(CrawlerBase):
                 urljoin(self.SITE_INDEX, url)
             else:
                 image_urls.append(url)
-
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title='',
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def search(self, name, page=1, size=None):
         url = urljoin(

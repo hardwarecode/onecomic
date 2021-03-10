@@ -65,7 +65,7 @@ class C177picCrawler(CrawlerBase):
             image_urls.append(p.img.get('data-lazy-src'))
         return image_urls
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         image_urls = [i for i in citem.page1_image_urls]
 
         def _get_page_images(page):
@@ -78,10 +78,7 @@ class C177picCrawler(CrawlerBase):
         result_list = concurrent_run(zip_args)
         for result in result_list:
             image_urls.extend(result)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def paesr_book_list(self, url):
         soup = self.get_soup(url)

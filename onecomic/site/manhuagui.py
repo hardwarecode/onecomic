@@ -96,17 +96,14 @@ class ManhuaguiCrawler(CrawlerBase):
         res = execjs.eval(new_js)
         return json.loads(re.search(r"(\{.*\})", res).group(1))
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         data = self.get_image_data_from_page(html)
         image_urls = []
         for i in data['files']:
             url = self.IMAGE_URL_PREFIX + data['path'] + i + '?e=%(e)s&m=%(m)s' % (data['sl'])
             image_urls.append(url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def search(self, name, page=1, size=None):
         url = urljoin(self.SITE_INDEX, '/s/{}_p{}.html'.format(name, page))

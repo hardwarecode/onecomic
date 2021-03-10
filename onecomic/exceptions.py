@@ -26,6 +26,16 @@ class ChapterNotFound(NotFoundError):
         return cls(msg)
 
 
+class ChapterImageNotFound(NotFoundError):
+    TEMPLATE = ("ChapterImageNotFound. site={site} comicid={comicid} "
+                "chapter_number={chapter_number} source_url={source_url}")
+
+    @classmethod
+    def from_template(cls, **kwargs):
+        msg = cls.TEMPLATE.format(**kwargs)
+        return cls(msg)
+
+
 class URLException(ComicbookException):
     pass
 

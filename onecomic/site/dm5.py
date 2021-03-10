@@ -79,7 +79,7 @@ class DM5Crawler(CrawlerBase):
 
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html, soup = self.get_html_and_soup(citem.source_url)
         image_urls = []
         div = soup.find('div', {'id': 'barChapter'})
@@ -122,10 +122,7 @@ class DM5Crawler(CrawlerBase):
                     added.add(i)
                     image_url = '%s%s?cid=%s&key=%s' % (pix, i, citem.cid, key)
                     image_urls.append(image_url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         if page > 1:

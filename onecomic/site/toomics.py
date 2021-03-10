@@ -79,7 +79,7 @@ class ToomicsCrawler(CrawlerBase):
             book.add_tag(name=tag_name, tag=tag_name)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         soup = self.get_soup(citem.source_url)
         div = soup.find('div', {'id': 'viewer-img'})
         image_urls = []
@@ -89,10 +89,7 @@ class ToomicsCrawler(CrawlerBase):
                                                 chapter_number=citem.chapter_number,
                                                 source_url=citem.source_url)
         image_urls = [img.get('data-src') for img in div.find_all('img')]
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         return self.get_tag_result(tag=None, page=page)

@@ -75,7 +75,7 @@ class C55comicCrawler(CrawlerBase):
                 image_urls.append(url)
         return image_urls
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         image_urls = citem.p1_image_urls
 
         def _func(page):
@@ -92,10 +92,7 @@ class C55comicCrawler(CrawlerBase):
         for urls in result:
             if urls:
                 image_urls.extend(urls)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title='',
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def parse_book_list(self, soup):
         result = self.new_search_result_item()

@@ -60,7 +60,7 @@ class Pufei8Crawler(CrawlerBase):
             book.add_tag(tag=tag_name, name=tag_name)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         packed = re.search(r'packed="(.*?)"', html).group(1)
         s = base64.b64decode(packed.encode()).decode()
@@ -69,10 +69,7 @@ class Pufei8Crawler(CrawlerBase):
         prefix = 'http://res.img.fffmanhua.com'
         for idx, url in re.findall(r'photosr\[(\d+)\] = "(.*?)";', js_str):
             image_urls.append(urljoin(prefix, url))
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def get_tags(self):
         tags = self.new_tags_item()

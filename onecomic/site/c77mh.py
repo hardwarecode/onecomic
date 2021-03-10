@@ -52,7 +52,7 @@ class C77mhCrawler(CrawlerBase):
                              title=title)
         return book
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         coid = citem.source_url.split('/')[-1].split('.')[0]
         s = re.search(r'<script type="text/javascript">(.*?)</script>', html, re.S).group(1).strip()
@@ -67,10 +67,7 @@ class C77mhCrawler(CrawlerBase):
             for url in msg.split('|'):
                 image_url = image_prefix + url + end
                 image_urls.append(image_url)
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def get_image_prefix(self, params):
         url = 'https://css.gdbyhtl.net/img_v1/cn_svr.aspx'

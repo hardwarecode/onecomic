@@ -67,17 +67,14 @@ class Mh160Crawler(CrawlerBase):
             prefix = "https://res.gezhengzhongyi.cn:20207"
         return prefix
 
-    def get_chapter_item(self, citem):
+    def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         str_id = re.search(r'qTcms_S_p_id="(.*?)"', html).group(1)
         prefix = self.get_pic_prefix(str_id)
         s = re.search(r'var qTcms_S_m_murl_e="(.*?)";', html).group(1)
         data = base64.b64decode(s.encode()).decode()
         image_urls = [prefix + url for url in data.replace('$qingtiandy$', '|').split('|')]
-        return self.new_chapter_item(chapter_number=citem.chapter_number,
-                                     title=citem.title,
-                                     image_urls=image_urls,
-                                     source_url=citem.source_url)
+        return image_urls
 
     def latest(self, page=1):
         if page > 1:

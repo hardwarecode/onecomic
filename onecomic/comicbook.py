@@ -13,25 +13,48 @@ from .utils import (
 )
 from .exceptions import (
     SiteNotSupport,
-    ChapterNotFound
+    ChapterNotFound,
+    ChapterImageNotFound
 )
 from .crawlerbase import CrawlerBase
-from .image import get_image_downloader
+from .image import ImageDownloader
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 logger = logging.getLogger(__name__)
+
+
+IMAGE_DOWNLOADER_INSTANCE = {}
+ALL_IMAGE_DOWNLOADER = None
+
+
+def get_image_downloader(site):
+    global ALL_IMAGE_DOWNLOADER
+    global IMAGE_DOWNLOADER_INSTANCE
+    if ALL_IMAGE_DOWNLOADER is None:
+        for file in os.listdir(os.path.join(HERE, "site")):
+            if re.match(r"^[a-zA-Z].*?\.py$", file):
+                importlib.import_module(".site.{}".format(file.split(".")[0]), __package__)
+        ALL_IMAGE_DOWNLOADER = {}
+        for image_downloader_cls in ImageDownloader.__subclasses__():
+            ALL_IMAGE_DOWNLOADER[image_downloader_cls.SITE] = image_downloader_cls
+    if site not in IMAGE_DOWNLOADER_INSTANCE:
+        downloader_cls = ALL_IMAGE_DOWNLOADER.get(site, ImageDownloader)
+        IMAGE_DOWNLOADER_INSTANCE[site] = downloader_cls(site)
+    return IMAGE_DOWNLOADER_INSTANCE[site]
 
 
 def find_all_crawler():
     for file in os.listdir(os.path.join(HERE, "site")):
         if re.match(r"^[a-zA-Z].*?\.py$", file):
             importlib.import_module(".site.{}".format(file.split(".")[0]), __package__)
-    return [crawler for crawler in CrawlerBase.__subclasses__() if crawler.SITE_ENABLE]
+    crawlers = [crawler for crawler in CrawlerBase.__subclasses__() if crawler.SITE_ENABLE]
+    return {crawler.SITE: crawler for crawler in crawlers}
 
 
-class ComicBook():
-    CRAWLER_CLS_MAP = {crawler.SITE: crawler for crawler in find_all_crawler()}
+class ComicBook(object):
+    CRAWLER_CLS_MAP = find_all_crawler()
     CHAPTER_NOT_CACHE_SITE = frozenset(['bilibili'])
+    IMAGE_DOWNLOADER = {}
 
     def __init__(self, site=None, comicid=None):
         if not site:
@@ -137,10 +160,13 @@ class ComicBook():
                                                   chapter_number=chapter_number,
                                                   source_url=self.crawler.source_url)
             raise ChapterNotFound(msg)
+
         if self.crawler.SITE in self.CHAPTER_NOT_CACHE_SITE \
                 or chapter_number not in self.chapter_cache[ext_name]:
-            citem = citems[chapter_number]
-            chapter_item = self.crawler.get_chapter_item(citem)
+            chapter_item = citems[chapter_number]
+            if chapter_item.image_urls is None:
+                chapter_item = self.crawler.get_chapter_item(chapter_item)
+
             self.chapter_cache[ext_name][chapter_number] = Chapter(
                 comicbook_ref=weakref.ref(self),
                 chapter_item=chapter_item,
@@ -186,7 +212,7 @@ class ComicBook():
         logger.debug("set_crawler_timeout. site=%s timeout=%s", self.crawler.SITE, timeout)
 
 
-class Chapter():
+class Chapter(object):
 
     def __init__(self, comicbook_ref, chapter_item, ext_name=None):
         self.ext_name = ext_name
@@ -255,11 +281,14 @@ class Chapter():
         if self._saved is True:
             return chapter_dir
         headers_list = self.comicbook.crawler.get_image_headers_list(self)
+        if not self.image_urls:
+            raise ChapterImageNotFound.from_template(
+                site=self.comicbook.site, comicid=self.comicbook.comicid,
+                chapter_number=self.chapter_item.chapter_number, source_url=self.chapter_item.source_url)
         self.comicbook.image_downloader.download_images(
             image_urls=self.image_urls,
             output_dir=chapter_dir,
-            headers_list=headers_list,
-            image_pipelines=self.chapter_item.image_pipelines)
+            headers_list=headers_list)
         self._saved = True
         return chapter_dir
 
