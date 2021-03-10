@@ -82,12 +82,32 @@ class Yymh889Crawler(CrawlerBase):
             book.add_chapter(chapter_number=chapter_number,
                              source_url=url,
                              title=title,
-                             image_urls=image_urls,
+                             image_urls=image_urls or None,
                              need_patch=need_patch)
             chapter_number += 1
         return book
 
     def get_chapter_item(self, citem):
+        if citem.image_urls is not None:
+            return citem
+        soup = self.get_soup(citem.source_url)
+        data = {}
+        idx = 0
+        for img in soup.find('section', {'class': 'reader-cartoon-chapter'}).find_all('img'):
+            r1 = re.search(r'图-(\d+)-(\d+)', img.get('alt'))
+            r2 = re.search(r'图-(\d+)', img.get('alt'))
+            if r1:
+                idx = int(r1.group(1))
+            elif r2:
+                idx = int(r2.group(1))
+            else:
+                logger.warn('unknown format. img tag=%s', img)
+                continue
+            data.setdefault(idx, [])
+            data[idx].append(img.get('src'))
+        sorted(data.items())
+        image_urls = ['||||'.join(i[1]) for i in sorted(data.items(), key=lambda x: x[0])]
+        citem.image_urls = image_urls
         return citem
 
     def latest(self, page=1):
