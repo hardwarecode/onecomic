@@ -91,7 +91,8 @@ class Yymh889Crawler(CrawlerBase):
         return citem
 
     def latest(self, page=1):
-        url = urljoin(self.SITE_INDEX, '/home/api/getpagex/tp/0-isnew-{}'.format(page))
+        url = urljoin(self.SITE_INDEX, '/home/api/cate/tp/1-0-2-0-{}'.format(page))
+        # url = urljoin(self.SITE_INDEX, '/home/api/getpagex/tp/0-isnew-{}'.format(page))
         api_data = self.get_json(url)
         result = self.new_search_result_item()
         for item in api_data['result'].get('list', []):
