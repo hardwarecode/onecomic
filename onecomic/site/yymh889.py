@@ -60,7 +60,7 @@ class Yymh889Crawler(CrawlerBase):
         total_page = api_data['result']['totalPage']
         chapter_number = 1
         data_list = api_data['result']['list']
-        for page in range(2, total_page):
+        for page in range(2, total_page + 1):
             api_url = 'http://yymh889.com/home/api/chapter_list/tp/{comicid}-1-{page}-{size}'.format(
                 comicid=self.comicid,
                 page=page,
