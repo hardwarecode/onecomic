@@ -119,7 +119,7 @@ class BilibiliCrawler(CrawlerBase):
         for idx, item in enumerate(sorted(api_data["data"]["ep_list"], key=lambda x: x["ord"]), start=1):
             chapter_number = idx
             cid = item['id']
-            title = item['title'].strip() or str(chapter_number)
+            title = item['title'].strip() or item.get('short_title', '')
             url = self.get_chapter_soure_url(cid)
             book.add_chapter(chapter_number=chapter_number, source_url=url, cid=cid, title=title)
         return book
