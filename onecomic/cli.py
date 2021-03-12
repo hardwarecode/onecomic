@@ -11,7 +11,7 @@ from .utils import (
     merge_books,
     merge_zip_books
 )
-from .session import SessionMgr
+from .session import ImageSession, CrawlerSession
 from .worker import WorkerPoolMgr
 from .utils.mail import Mail
 from . import VERSION
@@ -200,8 +200,8 @@ def download_search_result(result, **kwargs):
         download_main(comicbook=comicbook, **kwargs)
 
 
-def download_latest_all(page_str, **kwargs):
-    comicbook = kwargs.pop('comicbook')
+def download_latest_all(site, page_str, **kwargs):
+    comicbook = ComicBook(site=site, comicid=None)
     page_str = page_str or '1'
     for page in parser_chapter_str(page_str):
         try:
@@ -213,8 +213,8 @@ def download_latest_all(page_str, **kwargs):
         download_search_result(result, **kwargs)
 
 
-def download_tag_all(tag, page_str, **kwargs):
-    comicbook = kwargs.pop('comicbook')
+def download_tag_all(site, tag, page_str, **kwargs):
+    comicbook = ComicBook(site=site, comicid=None)
     page_str = page_str or '1'
     for page in parser_chapter_str(page_str):
         try:
@@ -226,8 +226,8 @@ def download_tag_all(tag, page_str, **kwargs):
         download_search_result(result, **kwargs)
 
 
-def download_search_all(name, page_str, **kwargs):
-    comicbook = kwargs.pop('comicbook')
+def download_search_all(site, name, page_str, **kwargs):
+    comicbook = ComicBook(site=site, comicid=None)
     page_str = page_str or '1'
     for page in parser_chapter_str(page_str):
         try:
@@ -240,7 +240,6 @@ def download_search_all(name, page_str, **kwargs):
 
 
 def download_url_list(config, url_file, **kwargs):
-    comicbook = kwargs.pop('comicbook')
     with open(url_file) as f:
         for line in f:
             line = line.strip()
@@ -259,7 +258,7 @@ def download_url_list(config, url_file, **kwargs):
                 echo_comicbook_desc(comicbook=comicbook, ext_name=kwargs.get('ext_name'))
                 download_main(comicbook=comicbook, **kwargs)
             except Exception:
-                logger.info('download comicbook by url error. url=%s', url)
+                logger.exception('download comicbook by url error. url=%s', url)
                 continue
 
 
@@ -294,30 +293,56 @@ def init_crawler(site, config):
     proxy = config.get_proxy(site=site)
     if proxy:
         logger.info('set proxy. %s', proxy)
-        SessionMgr.set_proxy(site=site, proxy=proxy)
+        CrawlerSession.set_proxy(site=site, proxy=proxy)
+        ImageSession.set_proxy(site=site, proxy=proxy)
     if config.verify:
         logger.info('set verify. verify=True')
-        SessionMgr.set_verify(site=site, verify=True)
+        CrawlerSession.set_verify(site=site, verify=True)
+        ImageSession.set_verify(site=site, verify=True)
 
     # 加载cookies
     cookies_path = config.get_cookies_path(site)
     if cookies_path and os.path.exists(cookies_path):
-        SessionMgr.load_cookies(site=site, path=cookies_path)
+        CrawlerSession.load_cookies(site=site, path=cookies_path)
         logger.info('load cookies success. %s', cookies_path)
+
+    ImageSession.set_timeout(site=site, timeout=config.image_timeout)
+    CrawlerSession.set_timeout(site=site, timeout=config.crawler_timeout)
 
 
 def save_cookies(site, config):
     cookies_path = config.get_cookies_path(site)
     if cookies_path:
         ensure_file_dir_exists(filepath=cookies_path)
-        SessionMgr.export_cookies(site=site, path=cookies_path)
+        CrawlerSession.export_cookies(site=site, path=cookies_path)
         logger.info("cookies saved. path={}".format(cookies_path))
+
+
+def echo_search_result(site, name):
+    comicbook = ComicBook(site=site, comicid=None)
+    result = comicbook.search(name=name)
+    msg_list = []
+    for item in result:
+        msg_list.append("comicid={}\t{}\tsource_url={}".format(
+            item.comicid, item.name, item.source_url)
+        )
+    logger.info('\n%s', '\n'.join(msg_list))
+    exit(0)
 
 
 def main():
     parser = get_parser()
     args = parser.parse_args()
     init_logger(debug=args.debug)
+
+    config = CrawlerConfig(args=args)
+    WorkerPoolMgr.set_worker(worker=config.worker)
+    CrawlerBase.DRIVER_PATH = config.driver_path
+    logger.debug('set DRIVER_PATH. DRIVER_PATH=%s', config.driver_path)
+    CrawlerBase.DRIVER_TYPE = config.driver_type
+    logger.debug('set DRIVER_TYPE. DRIVER_TYPE=%s', config.driver_type)
+    CrawlerBase.NODE_MODULES = config.node_modules
+    logger.debug('set NODE_MODULES. NODE_MODULES=%s', config.node_modules)
 
     if args.url:
         site = ComicBook.get_site_by_url(args.url)
@@ -328,39 +353,8 @@ def main():
         site = args.site
         comicid = args.comicid
     else:
-        parser.print_help()
-        exit(1)
-    config = CrawlerConfig(args=args)
-    WorkerPoolMgr.set_worker(worker=config.worker)
-    CrawlerBase.DRIVER_PATH = config.driver_path
-    logger.debug('set DRIVER_PATH. DRIVER_PATH=%s', config.driver_path)
-    CrawlerBase.DRIVER_TYPE = config.driver_type
-    logger.debug('set DRIVER_TYPE. DRIVER_TYPE=%s', config.driver_type)
-    CrawlerBase.NODE_MODULES = config.node_modules
-    logger.debug('set NODE_MODULES. NODE_MODULES=%s', config.node_modules)
-
-    comicbook = ComicBook(site=site, comicid=comicid)
-    comicbook.set_crawler_timeout(config.crawler_timeout)
-    comicbook.set_image_timeout(config.image_timeout)
-
-    if args.login:
-        comicbook.crawler.login()
-        save_cookies(site=site, config=config)
-    if args.show_tags:
-        init_crawler(site=site, config=config)
-        show_tags(comicbook=comicbook)
-        exit(0)
-
-    if args.name:
-        init_crawler(site=site, config=config)
-        result = comicbook.search(name=args.name)
-        msg_list = []
-        for item in result:
-            msg_list.append("comicid={}\t{}\tsource_url={}".format(
-                item.comicid, item.name, item.source_url)
-            )
-        logger.info('\n%s', '\n'.join(msg_list))
-        exit(0)
+        site = None
+        comicid = None
 
     if args.mail:
         is_send_mail = True
@@ -370,7 +364,6 @@ def main():
         mail = None
 
     download_main_kwargs = dict(
-        comicbook=comicbook,
         output_dir=config.output,
         chapters=args.chapter,
         is_download_all=args.all,
@@ -388,22 +381,30 @@ def main():
         crawler_delay=config.crawler_delay
     )
 
-    if args.url_file:
+    if site:
+        init_crawler(site=site, config=config)
+
+    if site and args.show_tags:
+        comicbook = ComicBook(site=site, comicid=comicid)
+        show_tags(comicbook=comicbook)
+    elif site and args.name:
+        echo_search_result(site=site, name=args.name)
+    elif args.url_file:
         download_url_list(config=config, url_file=args.url_file, **download_main_kwargs)
-    elif args.latest_all:
-        init_crawler(site=site, config=config)
-        download_latest_all(page_str=args.latest_page, **download_main_kwargs)
-    elif args.tag_all:
-        init_crawler(site=site, config=config)
-        download_tag_all(tag=args.tag, page_str=args.tag_page, **download_main_kwargs)
-    elif args.search_all:
-        init_crawler(site=site, config=config)
-        download_search_all(name=args.search_name, page_str=args.search_page, **download_main_kwargs)
-    else:
-        init_crawler(site=site, config=config)
+    elif site and args.latest_all:
+        download_latest_all(site=site, page_str=args.latest_page, **download_main_kwargs)
+    elif site and args.tag_all:
+        download_tag_all(site=site, tag=args.tag, page_str=args.tag_page, **download_main_kwargs)
+    elif site and args.search_all:
+        download_search_all(site=site, name=args.search_name, page_str=args.search_page, **download_main_kwargs)
+    elif site and comicid:
+        comicbook = ComicBook(site=site, comicid=comicid)
         comicbook.start_crawler()
         echo_comicbook_desc(comicbook=comicbook, ext_name=args.ext_name)
-        download_main(**download_main_kwargs)
+        download_main(comicbook=comicbook, **download_main_kwargs)
+    else:
+        parser.print_help()
+        exit(0)
 
 
 if __name__ == '__main__':

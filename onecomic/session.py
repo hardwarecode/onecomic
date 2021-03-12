@@ -8,11 +8,6 @@ from .utils import ensure_file_dir_exists
 
 requests.packages.urllib3.disable_warnings()
 
-HTTP_20_SITE = {
-    'qootoon_image': ['https://os1.52eyou.com'],
-    'webtoons_image': ['https://webtoon-phinf.pstatic.net'],
-}
-
 
 class SessionMgr(object):
     SESSION_INSTANCE = {}
@@ -24,6 +19,15 @@ class SessionMgr(object):
     }
     COOKIES_KEYS = ['name', 'value', 'path', 'domain', 'secure']
     DEFAULT_VERIFY = False
+    TIMEOUT_CONFIG = {}
+
+    @classmethod
+    def get_timeout(cls, site, default=30):
+        return cls.TIMEOUT_CONFIG.get(site, default)
+
+    @classmethod
+    def set_timeout(cls, site, timeout):
+        cls.TIMEOUT_CONFIG[site] = timeout
 
     @classmethod
     def get_session(cls, site):
@@ -32,9 +36,6 @@ class SessionMgr(object):
             session.headers.update(cls.DEFAULT_HEADERS)
             session.verify = cls.DEFAULT_VERIFY
             cls.SESSION_INSTANCE[site] = session
-            if site in HTTP_20_SITE:
-                for url in HTTP_20_SITE[site]:
-                    session.mount(url, HTTP20Adapter())
         return cls.SESSION_INSTANCE[site]
 
     @classmethod
@@ -110,3 +111,34 @@ class SessionMgr(object):
     def set_verify(cls, site, verify):
         session = cls.get_session(site)
         session.verify = verify
+
+
+class CrawlerSession(SessionMgr):
+
+    @classmethod
+    def get_session(cls, site):
+        if site not in cls.SESSION_INSTANCE:
+            session = requests.Session()
+            session.headers.update(cls.DEFAULT_HEADERS)
+            session.verify = cls.DEFAULT_VERIFY
+            cls.SESSION_INSTANCE[site] = session
+        return cls.SESSION_INSTANCE[site]
+
+
+class ImageSession(SessionMgr):
+    HTTP_20_SITE = {
+        'qootoon': ['https://os1.52eyou.com'],
+        'webtoons': ['https://webtoon-phinf.pstatic.net'],
+    }
+
+    @classmethod
+    def get_session(cls, site):
+        if site not in cls.SESSION_INSTANCE:
+            session = requests.Session()
+            session.headers.update(cls.DEFAULT_HEADERS)
+            session.verify = cls.DEFAULT_VERIFY
+            cls.SESSION_INSTANCE[site] = session
+            if site in cls.HTTP_20_SITE:
+                for url in cls.HTTP_20_SITE[site]:
+                    session.mount(url, HTTP20Adapter())
+        return cls.SESSION_INSTANCE[site]

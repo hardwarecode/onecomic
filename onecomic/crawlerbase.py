@@ -9,7 +9,7 @@ import execjs
 from bs4 import BeautifulSoup
 
 from .exceptions import URLException
-from .session import SessionMgr
+from .session import CrawlerSession
 
 logger = logging.getLogger(__name__)
 
@@ -232,23 +232,23 @@ class CrawlerBase(object):
         if self.NEEDED_NODE_PACKAGES:
             self.chekc_node_modules()
 
-    def set_timeout(self, timeout=30):
-        self.timeout = timeout
+    def get_timeout(self):
+        return CrawlerSession.get_timeout(site=self.site)
 
     def get_session(self):
-        return SessionMgr.get_session(site=self.SITE)
+        return CrawlerSession.get_session(site=self.SITE)
 
     def export_session(self, path):
-        SessionMgr.export_session(site=self.SITE, path=path)
+        CrawlerSession.export_session(site=self.SITE, path=path)
 
     def load_session(self, path):
-        SessionMgr.load_session(site=self.SITE, path=path)
+        CrawlerSession.load_session(site=self.SITE, path=path)
 
     def load_cookies(self, path):
-        SessionMgr.load_cookies(site=self.SITE, path=path)
+        CrawlerSession.load_cookies(site=self.SITE, path=path)
 
     def export_cookies(self, path):
-        SessionMgr.export_cookies(site=self.SITE, path=path)
+        CrawlerSession.export_cookies(site=self.SITE, path=path)
 
     def send_request(self, method, url, **kwargs):
         session = self.get_session()
@@ -381,7 +381,7 @@ class CrawlerBase(object):
                 logger.exception('unknow error. driver quit.')
                 self.close_driver()
                 return
-            SessionMgr.update_cookies(site=self.SITE, cookies=cookies)
+            CrawlerSession.update_cookies(site=self.SITE, cookies=cookies)
             if callable(check_login_status_func):
                 if check_login_status_func():
                     logger.info("login success")

@@ -6,7 +6,7 @@ import PIL.Image
 from PIL import UnidentifiedImageError
 
 from .exceptions import ImageDownloadError
-from .session import SessionMgr
+from .session import ImageSession
 from .utils import ensure_file_dir_exists
 from .worker import WorkerPoolMgr
 
@@ -43,14 +43,13 @@ class ImageDownloader(object):
     SITE = ''
 
     def __init__(self, site):
-        self.site = '%s_image' % site
-        self.timeout = 30
-
-    def set_timeout(self, timeout=30):
-        self.timeout = timeout
+        self.site = site
 
     def get_session(self):
-        return SessionMgr.get_session(site=self.site)
+        return ImageSession.get_session(site=self.site)
+
+    def get_timeout(self):
+        return ImageSession.get_timeout(site=self.site)
 
     def is_image_exists(self, image_path):
         if os.path.exists(image_path):
@@ -69,7 +68,7 @@ class ImageDownloader(object):
         headers = dict(session.headers, **(headers or {}))
 
         try:
-            response = session.get(image_url, timeout=self.timeout, headers=headers, **kwargs)
+            response = session.get(image_url, timeout=self.get_timeout(), headers=headers, **kwargs)
         except Exception as e:
             msg = "img download error: url=%s error: %s" % (image_url, e)
             raise ImageDownloadError(msg) from e
