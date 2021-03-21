@@ -397,7 +397,7 @@ def main():
         download_tag_all(site=site, tag=args.tag, page_str=args.tag_page, **download_main_kwargs)
     elif site and args.search_all:
         download_search_all(site=site, name=args.search_name, page_str=args.search_page, **download_main_kwargs)
-    elif site and comicid:
+    elif site:
         comicbook = ComicBook(site=site, comicid=comicid)
         comicbook.start_crawler()
         echo_comicbook_desc(comicbook=comicbook, ext_name=args.ext_name)
