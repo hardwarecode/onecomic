@@ -14,7 +14,7 @@ from .session import CrawlerSession
 logger = logging.getLogger(__name__)
 
 
-class ComicBookItem():
+class ComicBookItem(object):
     FIELDS = ["comicid", "name", "desc", "tag", "cover_image_url", "author",
               "source_url", "source_name", "crawl_time", "chapters", "ext_chapters",
               "status", 'tags', "site", "last_update_time"]
@@ -221,7 +221,6 @@ class CrawlerBase(object):
     _TAGS_INFO = None
 
     def __init__(self, comicid_or_url=None):
-        self.timeout = 30
         self._tag_info = None
         if self.REQUIRE_JAVASCRIPT:
             try:
@@ -233,10 +232,19 @@ class CrawlerBase(object):
             self.chekc_node_modules()
 
     def get_timeout(self):
-        return CrawlerSession.get_timeout(site=self.site)
+        return CrawlerSession.get_timeout(site=self.SITE)
 
     def get_session(self):
         return CrawlerSession.get_session(site=self.SITE)
+
+    def get_proxies(self):
+        proxy = CrawlerSession.get_proxy(site=self.SITE)
+        if proxy:
+            proxies = {
+                'http': proxy,
+                'https': proxy
+            }
+            return proxies
 
     def export_session(self, path):
         CrawlerSession.export_session(site=self.SITE, path=path)
@@ -253,12 +261,13 @@ class CrawlerBase(object):
     def send_request(self, method, url, **kwargs):
         session = self.get_session()
         kwargs.setdefault('headers', {'Referer': self.SITE_INDEX})
-        kwargs.setdefault('timeout', self.timeout)
+        kwargs.setdefault('timeout', self.get_timeout())
+        kwargs.setdefault('proxies', self.get_proxies())
         try:
             logger.debug('send_request. url=%s kwargs=%s', url, kwargs)
             return session.request(method=method, url=url, **kwargs)
         except Exception as e:
-            msg = "URL error. url={}".format(url)
+            msg = "NETWORK ERROR. can not open url: {}".format(url)
             raise URLException(msg) from e
 
     def get_html(self, url, encoding=None, **kwargs):

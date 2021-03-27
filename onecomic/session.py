@@ -5,6 +5,7 @@ import requests
 from hyper.contrib import HTTP20Adapter
 
 from .utils import ensure_file_dir_exists
+from .proxy import get_proxy_cls, ALL_PROXY_CLS
 
 requests.packages.urllib3.disable_warnings()
 
@@ -20,6 +21,7 @@ class SessionMgr(object):
     COOKIES_KEYS = ['name', 'value', 'path', 'domain', 'secure']
     DEFAULT_VERIFY = False
     TIMEOUT_CONFIG = {}
+    PROXY_CLS_CONFIG = {}
 
     @classmethod
     def get_timeout(cls, site, default=30):
@@ -95,17 +97,20 @@ class SessionMgr(object):
         session.cookies.clear_session_cookies()
 
     @classmethod
-    def set_proxy(cls, site, proxy):
-        session = cls.get_session(site)
-        session.proxies = {
-            'http': proxy,
-            'https': proxy
-        }
+    def set_proxy(cls, site, proxy, **kwargs):
+        proxy_cls = get_proxy_cls(proxy)
+        if proxy in ALL_PROXY_CLS:
+            proxy_cls.init(**kwargs)
+        else:
+            proxy_cls.init(proxy=proxy)
+        cls.PROXY_CLS_CONFIG[site] = proxy_cls
 
     @classmethod
     def get_proxy(cls, site):
-        session = cls.get_session(site)
-        return session.proxies.get('http')
+        proxy_cls = cls.PROXY_CLS_CONFIG.get(site)
+        if proxy_cls:
+            return proxy_cls.get_proxy()
+        return None
 
     @classmethod
     def set_verify(cls, site, verify):

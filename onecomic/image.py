@@ -51,6 +51,15 @@ class ImageDownloader(object):
     def get_timeout(self):
         return ImageSession.get_timeout(site=self.site)
 
+    def get_proxies(self):
+        proxy = ImageSession.get_proxy(site=self.site)
+        if proxy:
+            proxies = {
+                'http': proxy,
+                'https': proxy
+            }
+            return proxies
+
     def is_image_exists(self, image_path):
         if os.path.exists(image_path):
             try:
@@ -65,10 +74,10 @@ class ImageDownloader(object):
         if self.is_image_exists(target_path):
             return target_path
         session = self.get_session()
+        proxies = self.get_proxies()
         headers = dict(session.headers, **(headers or {}))
-
         try:
-            response = session.get(image_url, timeout=self.get_timeout(), headers=headers, **kwargs)
+            response = session.get(image_url, timeout=self.get_timeout(), headers=headers, proxies=proxies, **kwargs)
         except Exception as e:
             msg = "img download error: url=%s error: %s" % (image_url, e)
             raise ImageDownloadError(msg) from e
