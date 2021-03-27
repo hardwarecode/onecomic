@@ -11,7 +11,7 @@ class KuaidailiProxy(ProxyBase):
     def get_proxy(cls):
         assert cls.API_URL, 'KuaidailiProxy API_URL not set'
         proxy_ip = cls.session.get(cls.API_URL).text
-        return proxy_ip
+        return "socks5://%(proxy)s/" % {"proxy": proxy_ip}
 
     @classmethod
     def init(cls, api_url, **kwargs):
