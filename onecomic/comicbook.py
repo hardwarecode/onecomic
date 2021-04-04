@@ -288,7 +288,8 @@ class Chapter(object):
         self.comicbook.image_downloader.download_images(
             image_urls=self.image_urls,
             output_dir=chapter_dir,
-            headers_list=headers_list)
+            headers_list=headers_list,
+            image_pipelines=self.chapter_item.image_pipelines)
         self._saved = True
         return chapter_dir
 

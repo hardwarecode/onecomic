@@ -22,6 +22,7 @@ class SessionMgr(object):
     DEFAULT_VERIFY = False
     TIMEOUT_CONFIG = {}
     PROXY_CLS_CONFIG = {}
+    HTTP_20_SITE = {}
 
     @classmethod
     def get_timeout(cls, site, default=30):
@@ -38,6 +39,9 @@ class SessionMgr(object):
             session.headers.update(cls.DEFAULT_HEADERS)
             session.verify = cls.DEFAULT_VERIFY
             cls.SESSION_INSTANCE[site] = session
+            if site in cls.HTTP_20_SITE:
+                for url in cls.HTTP_20_SITE[site]:
+                    session.mount(url, HTTP20Adapter())
         return cls.SESSION_INSTANCE[site]
 
     @classmethod
@@ -119,15 +123,8 @@ class SessionMgr(object):
 
 
 class CrawlerSession(SessionMgr):
-
-    @classmethod
-    def get_session(cls, site):
-        if site not in cls.SESSION_INSTANCE:
-            session = requests.Session()
-            session.headers.update(cls.DEFAULT_HEADERS)
-            session.verify = cls.DEFAULT_VERIFY
-            cls.SESSION_INSTANCE[site] = session
-        return cls.SESSION_INSTANCE[site]
+    HTTP_20_SITE = {
+    }
 
 
 class ImageSession(SessionMgr):
@@ -135,15 +132,3 @@ class ImageSession(SessionMgr):
         'qootoon': ['https://os1.52eyou.com'],
         'webtoons': ['https://webtoon-phinf.pstatic.net'],
     }
-
-    @classmethod
-    def get_session(cls, site):
-        if site not in cls.SESSION_INSTANCE:
-            session = requests.Session()
-            session.headers.update(cls.DEFAULT_HEADERS)
-            session.verify = cls.DEFAULT_VERIFY
-            cls.SESSION_INSTANCE[site] = session
-            if site in cls.HTTP_20_SITE:
-                for url in cls.HTTP_20_SITE[site]:
-                    session.mount(url, HTTP20Adapter())
-        return cls.SESSION_INSTANCE[site]

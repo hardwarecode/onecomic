@@ -35,7 +35,7 @@ class ManhuaguiCrawler(CrawlerBase):
         return self.get_source_url(self.comicid)
 
     def get_source_url(self, comicid):
-        return urljoin(self.SITE_INDEX, "/comic/{}".format(comicid))
+        return urljoin(self.SITE_INDEX, "/comic/{}/".format(comicid))
 
     def get_comicbook_item(self):
         soup = self.get_soup(self.source_url)
