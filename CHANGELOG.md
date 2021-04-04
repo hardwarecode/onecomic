@@ -1,5 +1,11 @@
 **unreleased**
+**v0.1.17**
+- fix image pipelines
+- 添加爱飞漫画源
+
 **v0.1.16**
+- fix proxy format
+
 **v0.1.15**
 - 支持自定义获取代理方法
 
