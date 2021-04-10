@@ -262,7 +262,7 @@ class CrawlerBase(object):
 
     def send_request(self, method, url, **kwargs):
         session = self.get_session()
-        # kwargs.setdefault('headers', {'Referer': self.SITE_INDEX})
+        kwargs.setdefault('headers', {'Referer': self.SITE_INDEX})
         kwargs.setdefault('timeout', self.get_timeout())
         kwargs.setdefault('proxies', self.get_proxies())
         try:
