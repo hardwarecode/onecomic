@@ -1,7 +1,11 @@
 **unreleased**
+**v0.1.18**
+- 添加漫画源： 优酷漫画 https://www.ykmh.com/
+- 添加漫画源: 来漫画 https://www.laimanhua.com/
+
 **v0.1.17**
 - fix image pipelines
-- 添加爱飞漫画源
+- 添加漫画源: 爱飞漫画源 https://www.2feimh.com/
 
 **v0.1.16**
 - fix proxy format
