@@ -125,8 +125,8 @@ class ComicBook(object):
         ext_name = ext_name or self.crawler.DEFAULT_EXT_NAME
         return self.chapter_desc.get(ext_name, {}).get('last_chapter_title', '')
 
-    def search(self, name=None, page=1, limit=None):
-        return self.crawler.search(name, page=page, size=limit)
+    def search(self, name=None, page=1):
+        return self.crawler.search(name, page=page)
 
     def latest(self, page=1):
         return self.crawler.latest(page=page)

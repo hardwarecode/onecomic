@@ -220,6 +220,8 @@ class CrawlerBase(object):
     # 站点标签信息 缓存
     _TAGS_INFO = None
 
+    BS4_PARSER = 'html.parser'
+
     def __init__(self, comicid_or_url=None):
         self._tag_info = None
         if self.REQUIRE_JAVASCRIPT:
@@ -260,11 +262,11 @@ class CrawlerBase(object):
 
     def send_request(self, method, url, **kwargs):
         session = self.get_session()
-        kwargs.setdefault('headers', {'Referer': self.SITE_INDEX})
+        # kwargs.setdefault('headers', {'Referer': self.SITE_INDEX})
         kwargs.setdefault('timeout', self.get_timeout())
         kwargs.setdefault('proxies', self.get_proxies())
         try:
-            logger.debug('send_request. url=%s kwargs=%s', url, kwargs)
+            logger.debug('send_request. method=%s url=%s kwargs=%s', method, url, kwargs)
             return session.request(method=method, url=url, **kwargs)
         except Exception as e:
             msg = "NETWORK ERROR. can not open url: {}".format(url)
@@ -279,12 +281,12 @@ class CrawlerBase(object):
 
     def get_html_and_soup(self, url, encoding=None, **kwargs):
         html = self.get_html(url, encoding=encoding, **kwargs)
-        soup = BeautifulSoup(html, 'html.parser')
+        soup = BeautifulSoup(html, self.BS4_PARSER)
         return html, soup
 
     def get_soup(self, url, encoding=None, **kwargs):
         html = self.get_html(url, encoding=encoding, **kwargs)
-        return BeautifulSoup(html, 'html.parser')
+        return BeautifulSoup(html, self.BS4_PARSER)
 
     def get_json(self, url, **kwargs):
         response = self.send_request("GET", url, **kwargs)
@@ -337,7 +339,7 @@ class CrawlerBase(object):
     def new_tags_item(self, **kwargs):
         return TagsItem(**kwargs)
 
-    def search(self, name, page=1, size=None):
+    def search(self, name, page=1):
         """
         :return SearchResultItem:
         """

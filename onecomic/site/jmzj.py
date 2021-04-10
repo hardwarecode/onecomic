@@ -112,9 +112,9 @@ class C55comicCrawler(CrawlerBase):
         else:
             url = urljoin(self.SITE_INDEX, "/label/update.html")
         soup = self.get_soup(url)
-        return self.parser_boo_list(soup)
+        return self.parser_book_list(soup)
 
-    def parser_boo_list(self, soup):
+    def parser_book_list(self, soup):
         result = self.new_search_result_item()
         for li in soup.find('div', {'class': 'bookList_3'}).find_all('div', {'class': 'item ib'}):
             href = li.a.get('href')
