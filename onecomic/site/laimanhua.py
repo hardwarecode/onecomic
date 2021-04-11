@@ -116,6 +116,10 @@ class LaimanhuaCrawler(CrawlerBase):
         dict(name='少女', tag_id='shaonv'),
         dict(name='恋爱', tag_id='lianai'),
         dict(name='生活', tag_id='shenghuo'),
+        dict(name='日韩漫画', tag_id='zaixian_rhmh'),
+        dict(name='国产漫画', tag_id='zaixian_dlmh'),
+        dict(name='欧美漫画', tag_id='zaixian_ommh'),
+        dict(name='港台漫画', tag_id='zaixian_gtmh'),
     ]
 
     def get_tags(self):
@@ -130,8 +134,6 @@ class LaimanhuaCrawler(CrawlerBase):
     def get_tag_result(self, tag, page):
         if not tag:
             return self.latest(page=page)
-        url = "https://www.laimanhua.com/kanmanhua/%s/" % tag
-        if page >= 1:
-            url += "%s.html" % page
+        url = "https://www.laimanhua.com/kanmanhua/%s/%s.html" % (tag, page)
         soup = self.get_soup(url)
         return self.parser_book_list(soup)
