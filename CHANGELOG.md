@@ -1,4 +1,5 @@
 **unreleased**
+**v0.1.20**
 **v0.1.19**
 **v0.1.18**
 - 添加漫画源： 优酷漫画 https://www.ykmh.com/
