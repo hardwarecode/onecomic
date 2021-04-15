@@ -1,11 +1,14 @@
+import os
 import re
 import logging
-import base64
+import execjs
 from urllib.parse import urljoin
 from urllib.parse import urlencode
 from ..crawlerbase import CrawlerBase
 
 logger = logging.getLogger(__name__)
+
+HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 class LaimanhuaCrawler(CrawlerBase):
@@ -19,6 +22,8 @@ class LaimanhuaCrawler(CrawlerBase):
     DEFAULT_TAG = "rexue"
     COMICID_PATTERN = re.compile(r'/kanmanhua/(\d+)/?')
     SITE_ENCODEING = 'gbk'
+    REQUIRE_JAVASCRIPT = True
+    BASE64_JS_PATH = os.path.abspath(os.path.join(HERE, '../js/laimanhua_base64.js'))
 
     @property
     def source_url(self):
@@ -45,19 +50,31 @@ class LaimanhuaCrawler(CrawlerBase):
                                        source_url=self.source_url)
         for chapter_number, li in enumerate(reversed(soup.find('div', {'id': 'play_0'}).ul.find_all('li')), start=1):
             href = li.a.get('href')
+            cid = re.search(r'/\d+/(\d+)\.html', href).group(1)
             url = urljoin(self.SITE_INDEX, href)
             title = li.a.text.strip()
             book.add_chapter(chapter_number=chapter_number,
                              source_url=url,
-                             title=title)
+                             title=title,
+                             cid=int(cid))
         return book
 
     def get_chapter_image_urls(self, citem):
+        # https://www.laimanhua.com/template/skin4_20110501/js/laimanhuastyle/base64.js
         html = self.get_html(citem.source_url)
-        s = re.search(r"var picTree ='(.*?)'", html).group(1)
-        s = base64.b64decode(s.encode()).decode()
-        prefix = 'https://mhpic88.miyeye.cn:8443'
-        image_urls = [prefix + i for i in s.split('$qingtiandy$')]
+        picTree = re.search(r"(var picTree ='.*?';)", html).group(1)
+        js_content = open(self.BASE64_JS_PATH, encoding='utf-8').read()
+
+        js_content += '\n'.join([
+            picTree,
+            'var currentChapterid={};'.format(citem.cid)
+        ])
+        ctx = execjs.get().compile(js_content, cwd=self.NODE_MODULES)
+        urls = ctx.eval(f'getUrlpics()')
+        image_urls = []
+        for idx, url in enumerate(urls):
+            fullurl = ctx.eval(f'getcurpic({idx})')
+            image_urls.append(fullurl)
         return image_urls
 
     def latest(self, page=1):
