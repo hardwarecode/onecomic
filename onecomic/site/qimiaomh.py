@@ -30,8 +30,7 @@ class QimiaomhCrawler(CrawlerBase):
 
     def get_comicbook_item(self):
         soup = self.get_soup(self.source_url)
-        logger.info(soup)
-        name = soup.h1.text
+        name = soup.find('div', {'class', 'ctdbLeft'}).a.get('title').strip()
         soup.find('p', {'class': 'author'}).find('span', {'class': 'lineTit'}).decompose()
         author = soup.find('p', {'class': 'author'}).text.strip()
 
