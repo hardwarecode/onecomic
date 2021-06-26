@@ -4,6 +4,8 @@ from onecomic.comicbook import ComicBook
 from onecomic.config import CrawlerConfig
 from onecomic.session import SessionMgr
 from onecomic.exceptions import SiteNotSupport
+from onecomic.crawlerbase import CrawlerBase
+
 logger = logging.getLogger()
 
 
@@ -16,10 +18,12 @@ def _test_crawl_comicbook(site, comicid=None,
         return
 
     config = CrawlerConfig()
+    CrawlerBase.NODE_MODULES = config.node_modules
     proxy = config.get_proxy(site=site)
     if proxy:
         logger.info('set proxy. site=%s proxy=-%s', site, proxy)
         SessionMgr.set_proxy(site=site, proxy=proxy)
+
     comicbook.start_crawler()
     chapter = comicbook.Chapter(chapter_number=chapter_number)
     assert len(chapter.image_urls) > 0
@@ -174,12 +178,24 @@ def test_qootoon():
 
 
 def test_yymh889():
-    _test_crawl_comicbook(site='yymh889', test_search=False)
+    _test_crawl_comicbook(site='yymh889')
 
 
 def test_ykmh():
-    _test_crawl_comicbook(site='ykmh', test_search=False)
+    _test_crawl_comicbook(site='ykmh')
 
 
 def test_laimanhua():
-    _test_crawl_comicbook(site='laimanhua', test_search=False)
+    _test_crawl_comicbook(site='laimanhua')
+
+
+def test_qimiaomh():
+    _test_crawl_comicbook(site='qimiaomh')
+
+
+def test_sixmh6():
+    _test_crawl_comicbook(site='sixmh6')
+
+
+def test_qiman6():
+    _test_crawl_comicbook(site='qiman6')
