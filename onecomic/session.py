@@ -1,25 +1,24 @@
 import json
-import pickle
+import logging
 
-import requests
-from hyper.contrib import HTTP20Adapter
+import httpx
+from httpx_socks import SyncProxyTransport
 
 from .utils import ensure_file_dir_exists
 from .proxy import get_proxy_cls, ALL_PROXY_CLS
 
-requests.packages.urllib3.disable_warnings()
+logger = logging.getLogger(__name__)
 
 
 class SessionMgr(object):
     SESSION_INSTANCE = {}
     DEFAULT_HEADERS = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36'
     }
-    COOKIES_KEYS = ['name', 'value', 'path', 'domain', 'secure']
-    DEFAULT_VERIFY = False
+    COOKIES_KEYS = ['name', 'value', 'path', 'domain']
     TIMEOUT_CONFIG = {}
     PROXY_CLS_CONFIG = {}
-    HTTP_20_SITE = {}
+    HTTP_20_SITE = ['webtoons', 'toomics']
 
     @classmethod
     def get_timeout(cls, site, default=30):
@@ -32,34 +31,25 @@ class SessionMgr(object):
     @classmethod
     def get_session(cls, site):
         if site not in cls.SESSION_INSTANCE:
-            session = requests.Session()
-            session.headers.update(cls.DEFAULT_HEADERS)
-            session.verify = cls.DEFAULT_VERIFY
+            session = cls.new_session(site=site)
             cls.SESSION_INSTANCE[site] = session
-            if site in cls.HTTP_20_SITE:
-                for url in cls.HTTP_20_SITE[site]:
-                    session.mount(url, HTTP20Adapter())
         return cls.SESSION_INSTANCE[site]
+
+    @classmethod
+    def new_session(cls, site):
+        http2 = site in cls.HTTP_20_SITE
+        transport = None
+        proxy_url = cls.get_proxy(site)
+        if proxy_url:
+            transport = SyncProxyTransport.from_url(proxy_url)
+        session = httpx.Client(verify=False, http2=http2, transport=transport)
+        session.headers.update(cls.DEFAULT_HEADERS)
+        return session
 
     @classmethod
     def set_session(cls, site, session):
         cls.SESSION_INSTANCE[site] = session
         return session
-
-    @classmethod
-    def load_session(cls, site, path):
-        with open(path, "rb") as f:
-            session = pickle.load(f)
-            assert isinstance(session, requests.Session)
-            cls.set_session(site, session)
-            return session
-
-    @classmethod
-    def export_session(cls, site, path):
-        ensure_file_dir_exists(path)
-        session = cls.get_session(site)
-        with open(path, "wb") as f:
-            pickle.dump(session, f)
 
     @classmethod
     def update_cookies(cls, site, cookies):
@@ -95,7 +85,7 @@ class SessionMgr(object):
     @classmethod
     def clear_cookies(cls, site):
         session = cls.get_session(site=site)
-        session.cookies.clear_session_cookies()
+        session.cookies.clear()
 
     @classmethod
     def set_proxy(cls, site, proxy, **kwargs):
@@ -106,6 +96,11 @@ class SessionMgr(object):
             proxy_cls.init(proxy=proxy)
         cls.PROXY_CLS_CONFIG[site] = proxy_cls
 
+        old_session = cls.get_session(site)
+        new_session = cls.new_session(site)
+        cls.set_session(site=site, session=new_session)
+        old_session.close()
+
     @classmethod
     def get_proxy(cls, site):
         proxy_cls = cls.PROXY_CLS_CONFIG.get(site)
@@ -113,19 +108,10 @@ class SessionMgr(object):
             return proxy_cls.get_proxy()
         return None
 
-    @classmethod
-    def set_verify(cls, site, verify):
-        session = cls.get_session(site)
-        session.verify = verify
-
 
 class CrawlerSession(SessionMgr):
-    HTTP_20_SITE = {
-    }
+    pass
 
 
 class ImageSession(SessionMgr):
-    HTTP_20_SITE = {
-        'qootoon': ['https://os1.52eyou.com'],
-        'webtoons': ['https://webtoon-phinf.pstatic.net'],
-    }
+    pass

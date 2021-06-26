@@ -239,21 +239,6 @@ class CrawlerBase(object):
     def get_session(self):
         return CrawlerSession.get_session(site=self.SITE)
 
-    def get_proxies(self):
-        proxy = CrawlerSession.get_proxy(site=self.SITE)
-        if proxy:
-            proxies = {
-                'http': proxy,
-                'https': proxy
-            }
-            return proxies
-
-    def export_session(self, path):
-        CrawlerSession.export_session(site=self.SITE, path=path)
-
-    def load_session(self, path):
-        CrawlerSession.load_session(site=self.SITE, path=path)
-
     def load_cookies(self, path):
         CrawlerSession.load_cookies(site=self.SITE, path=path)
 
@@ -262,11 +247,13 @@ class CrawlerBase(object):
 
     def send_request(self, method, url, **kwargs):
         session = self.get_session()
-        kwargs.setdefault('headers', {'Referer': self.SITE_INDEX})
+        headers = kwargs.pop('headers', {})
+        headers.setdefault('Referer', self.SITE_INDEX)
         kwargs.setdefault('timeout', self.get_timeout())
-        kwargs.setdefault('proxies', self.get_proxies())
+        session.headers.update(headers)
         try:
-            logger.debug('send_request. method=%s url=%s kwargs=%s', method, url, kwargs)
+            logger.debug('send_request. method=%s url=%s kwargs=%s headers=%s cookies=%s',
+                         method, url, kwargs, session.headers, session.cookies)
             return session.request(method=method, url=url, **kwargs)
         except Exception as e:
             msg = "NETWORK ERROR. can not open url: {}".format(url)

@@ -10,7 +10,7 @@ from ..crawlerbase import CrawlerBase
 logger = logging.getLogger(__name__)
 
 
-class C55comicCrawler(CrawlerBase):
+class JmzjCrawler(CrawlerBase):
 
     SITE = "jmzj"
     SITE_INDEX = 'http://jmzj.xyz/'
@@ -145,7 +145,7 @@ class C55comicCrawler(CrawlerBase):
             url = 'http://jmzj.xyz/booktype/5--%s---.html' % (tag)
         soup = self.get_soup(url)
         soup = self.get_soup(url)
-        return self.parser_boo_list(soup)
+        return self.parser_book_list(soup)
 
     def search(self, name, page, size=None):
         if page > 1:
@@ -153,4 +153,4 @@ class C55comicCrawler(CrawlerBase):
         else:
             url = 'http://jmzj.xyz/search/-------.html?wd=%s' % name
         soup = self.get_soup(url)
-        return self.parser_boo_list(soup)
+        return self.parser_book_list(soup)

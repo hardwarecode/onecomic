@@ -22,6 +22,7 @@ class NvshensCrawler(CrawlerBase):
     SITE_ENCODEING = 'utf-8'
     COMICID_PATTERN = re.compile(r'/g/(\d+)/?')
     SINGLE_CHAPTER = True
+    SITE_ENABLE = False
 
     @property
     def source_url(self):

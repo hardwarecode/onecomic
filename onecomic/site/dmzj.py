@@ -19,8 +19,8 @@ class DmzjCrawler(CrawlerBase):
     SOURCE_NAME = "动漫之家"
     LOGIN_URL = SITE_INDEX
 
-    DEFAULT_COMICID = 'sichunqijcdexienaijishangzhenpin'
-    DEFAULT_SEARCH_NAME = '海贼'
+    DEFAULT_COMICID = 'xujiadezhentan'
+    DEFAULT_SEARCH_NAME = '虚假的侦探'
     DEFAULT_TAG = "0-1-0-0-0-0"
 
     @classmethod

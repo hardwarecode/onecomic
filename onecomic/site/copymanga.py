@@ -132,7 +132,7 @@ class CopymangaCrawler(CrawlerBase):
     def search(self, name, page, size=None):
         limit = 20
         offset = (page - 1) * limit
-        api_url = "https://copymanga.com/api/kb/web/search/comics?offset=%s&platform=2&limit=%s&q=%s"
+        api_url = "https://copymanga.com/api/kb/web/searchc/comics?offset=%s&platform=2&limit=%s&q=%s&q_type="
         url = api_url % (offset, limit, name)
         data = self.get_json(url)
         result = self.new_search_result_item()

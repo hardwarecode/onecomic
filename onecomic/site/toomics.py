@@ -20,6 +20,7 @@ class ToomicsCrawler(CrawlerBase):
     SITE_ENCODEING = 'utf-8'
     COMICID_PATTERN1 = re.compile(r'toomics\.com/(.*?)/webtoon/episode/toon/(\d+)')
     COMICID_PATTERN2 = re.compile(r'toomics\.com/(.*?)/webtoon/detail/code/\d+/ep/\d+/toon/(\d+)')
+    SITE_ENABLE = False
 
     @classmethod
     def get_comicid_by_url(cls, comicid_or_url):

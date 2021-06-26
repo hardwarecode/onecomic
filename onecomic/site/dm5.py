@@ -17,8 +17,8 @@ class DM5Crawler(CrawlerBase):
     SOURCE_NAME = "DM5"
     LOGIN_URL = SITE_INDEX
 
-    DEFAULT_COMICID = 'douluodalu'
-    DEFAULT_SEARCH_NAME = '斗罗大陆'
+    DEFAULT_COMICID = 'motadalu'
+    DEFAULT_SEARCH_NAME = '魔塔大陆'
     DEFAULT_TAG = "31"
     COMICID_PATTERN = re.compile(r'/manhua-(([_a-zA-Z0-9\-]*))/?')
 

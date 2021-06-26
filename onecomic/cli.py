@@ -75,9 +75,6 @@ def get_parser():
     parser.add_argument('-s', '--site', type=str, choices=ComicBook.CRAWLER_CLS_MAP.keys(),
                         help=site_help_msg)
 
-    parser.add_argument('--verify', action='store_true',
-                        help="verify")
-
     parser.add_argument('--driver-path', type=str, help="selenium driver")
 
     parser.add_argument('--driver-type', type=str,
@@ -295,10 +292,6 @@ def init_crawler(site, config):
         logger.info('set proxy. %s', proxy)
         CrawlerSession.set_proxy(site=site, proxy=proxy)
         ImageSession.set_proxy(site=site, proxy=proxy)
-    if config.verify:
-        logger.info('set verify. verify=True')
-        CrawlerSession.set_verify(site=site, verify=True)
-        ImageSession.set_verify(site=site, verify=True)
 
     # 加载cookies
     cookies_path = config.get_cookies_path(site)

@@ -17,7 +17,6 @@ class CrawlerConfig(object):
     QUALITY = 'quality'
     MAX_HEIGHT = 'max_height'
     NODE_MODULES = 'node_modules'
-    VERIFY = 'verify'
     WORKER = 'worker'
     IMAGE_TIMEOUT = 'image_timeout'
     CRAWLER_TIMEOUT = 'crawler_timeout'
@@ -31,7 +30,6 @@ class CrawlerConfig(object):
         NODE_MODULES: 'node_modules',
         CONFIG_FILE: 'config.ini',
         WORKER: 4,
-        VERIFY: False,
         IMAGE_TIMEOUT: 30,
         CRAWLER_TIMEOUT: 30,
         CRAWLER_DELAY: 0,
@@ -133,10 +131,6 @@ class CrawlerConfig(object):
     @property
     def node_modules(self):
         return self.config[self.NODE_MODULES]
-
-    @property
-    def verify(self):
-        return bool(self.config[self.VERIFY])
 
     @property
     def output(self):

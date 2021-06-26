@@ -3,12 +3,18 @@ import logging
 from onecomic.comicbook import ComicBook
 from onecomic.config import CrawlerConfig
 from onecomic.session import SessionMgr
+from onecomic.exceptions import SiteNotSupport
 logger = logging.getLogger()
 
 
 def _test_crawl_comicbook(site, comicid=None,
                           chapter_number=1, test_search=True):
-    comicbook = ComicBook(site=site, comicid=comicid)
+    try:
+        comicbook = ComicBook(site=site, comicid=comicid)
+    except SiteNotSupport:
+        logger.info('SiteNotSupport. site=%s', site)
+        return
+
     config = CrawlerConfig()
     proxy = config.get_proxy(site=site)
     if proxy:
@@ -169,3 +175,11 @@ def test_qootoon():
 
 def test_yymh889():
     _test_crawl_comicbook(site='yymh889', test_search=False)
+
+
+def test_ykmh():
+    _test_crawl_comicbook(site='ykmh', test_search=False)
+
+
+def test_laimanhua():
+    _test_crawl_comicbook(site='laimanhua', test_search=False)

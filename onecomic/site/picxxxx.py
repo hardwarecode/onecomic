@@ -20,6 +20,7 @@ class PicxxxxCrawler(CrawlerBase):
     DEFAULT_TAG = ""
     COMICID_PATTERN = re.compile(r'picxxxx\.top/(\d{4}[\/\-]\d{2}[\/\-]\d{2}[\/\-]\d+)(?:\.html)?')
     SINGLE_CHAPTER = True
+    SITE_ENABLE = False
 
     @classmethod
     def get_comicid_by_url(cls, comicid_or_url):

@@ -70,7 +70,7 @@ class C77mhCrawler(CrawlerBase):
         return image_urls
 
     def get_image_prefix(self, params):
-        url = 'https://css.gdbyhtl.net/img_v1/cn_svr.aspx'
+        url = 'https://css.gdbyhtl.net:5443/img_v1/cn_svr.aspx'
         html = self.get_html(url, params=params)
         prefix = re.search(
             r'(http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+)',

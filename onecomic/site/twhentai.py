@@ -8,7 +8,7 @@ from ..worker import concurrent_run
 logger = logging.getLogger(__name__)
 
 
-class C55comicCrawler(CrawlerBase):
+class TwhentaiCrawler(CrawlerBase):
 
     SITE = "twhentai"
     SITE_INDEX = 'http://twhentai.com/'
@@ -21,6 +21,7 @@ class C55comicCrawler(CrawlerBase):
     DEFAULT_COMICID = 'hentai_doujin-86561'
     DEFAULT_SEARCH_NAME = '姐姐'
     DEFAULT_TAG = ""
+    SITE_ENABLE = False
 
     @classmethod
     def get_comicid_by_url(cls, comicid_or_url):

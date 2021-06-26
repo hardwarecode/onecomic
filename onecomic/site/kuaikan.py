@@ -18,7 +18,7 @@ class KuaiKanCrawler(CrawlerBase):
 
     LOGIN_URL = urljoin(SITE_INDEX, "/webs/loginh?redirect={}".format(SITE_INDEX))
     DEFAULT_COMICID = '1338'
-    DEFAULT_SEARCH_NAME = '海贼王'
+    DEFAULT_SEARCH_NAME = '妹妹'
     DEFAULT_TAG = 'tag_0'
     COMICID_PATTERN = re.compile(r'/web/topic/(\d+)/?')
     REQUIRE_JAVASCRIPT = True
@@ -82,7 +82,7 @@ class KuaiKanCrawler(CrawlerBase):
     def search(self, name, page=1, size=None):
         if page != 1:
             return self.new_search_result_item()
-        url = urljoin(self.SITE_INDEX, "/s/result/{}/".format(name))
+        url = urljoin(self.SITE_INDEX, "/sou/{}/".format(name))
         html = self.get_html(url)
         data = self.parse_api_data_from_page(html)
         result = self.new_search_result_item()

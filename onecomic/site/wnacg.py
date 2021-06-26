@@ -14,7 +14,7 @@ class WnacgCrawler(CrawlerBase):
     SOURCE_NAME = "绅士漫画"
     LOGIN_URL = SITE_INDEX
 
-    DEFAULT_COMICID = '110785'
+    DEFAULT_COMICID = '123107'
     DEFAULT_SEARCH_NAME = '漢化'
     DEFAULT_TAG = "3"
     R18 = True
@@ -76,7 +76,8 @@ class WnacgCrawler(CrawlerBase):
             name = li.a.get('title')
             name = re.sub(r'<[^>]+>', '', name, re.S)
             comicid = href.rsplit('.', 1)[0].split('-')[-1]
-            cover_image_url = 'http:' + li.img.get('data-original')
+            url = li.img.get('data-original') or li.img.get('src')
+            cover_image_url = 'http:' + url
             source_url = self.get_source_url(comicid)
             result.add_result(comicid=comicid,
                               name=name,
