@@ -55,7 +55,7 @@ class Gufengmh8Crawler(CrawlerBase):
         if tag_id:
             book.add_tag(name=tag_name, tag=tag_id)
 
-        li_list = soup.find('ul', {'id': 'chapter-list-1'}).find_all('li')
+        li_list = soup.find('div', {'class': 'chapter-body clearfix'}).ul.find_all('li')
         for chapter_number, li in enumerate(li_list, start=1):
             href = li.a.get('href')
             url = urljoin(self.SITE_INDEX, href)
