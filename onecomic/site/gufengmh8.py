@@ -59,7 +59,7 @@ class Gufengmh8Crawler(CrawlerBase):
             ext_name = ''
             if idx >= 1:
                 ext_name = div.find('div', {'class': 'caption pull-left'}).span.text.strip()
-            li_list = soup.find('div', {'class': 'chapter-body clearfix'}).ul.find_all('li')
+            li_list = div.find('div', {'class': 'chapter-body clearfix'}).ul.find_all('li')
             for chapter_number, li in enumerate(li_list, start=1):
                 href = li.a.get('href')
                 url = urljoin(self.SITE_INDEX, href)
