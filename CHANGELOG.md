@@ -1,4 +1,8 @@
 **unreleased**
+**v0.2.7**
+- 添加漫画源: 波动boodo https://boodo.qq.com/
+- 添加漫画源: 3250漫画 https://www.3250mh.com/
+
 **v0.2.6**
 **v0.2.5**
 **v0.2.4**
