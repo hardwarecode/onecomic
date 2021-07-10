@@ -199,3 +199,11 @@ def test_sixmh6():
 
 def test_qiman6():
     _test_crawl_comicbook(site='qiman6')
+
+
+def test_3250mh():
+    _test_crawl_comicbook(site='3250mh')
+
+
+def test_boodo():
+    _test_crawl_comicbook(site='boodo')

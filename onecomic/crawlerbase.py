@@ -305,8 +305,14 @@ class CrawlerBase(object):
         :return ChapterItem instance:
         """
         image_urls = self.get_chapter_image_urls(citem)
-        citem.image_urls = image_urls
-        return citem
+        return ChapterItem(
+            site=self.SITE,
+            comicid=self.comicid,
+            source_name=self.SOURCE_NAME,
+            title=citem.title,
+            chapter_number=citem.chapter_number,
+            source_url=citem.source_url,
+            image_urls=image_urls)
 
     def get_chapter_image_urls(self, citem):
         raise NotImplementedError
