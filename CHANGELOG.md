@@ -1,4 +1,8 @@
 **unreleased**
+**v0.2.8**
+- 添加漫画源: 漫番漫画 http://www.myfcomic.com/
+- 漫画柜其它域名支持 https://www.mhgui.com/
+
 **v0.2.7**
 - 添加漫画源: 波动boodo https://boodo.qq.com/
 - 添加漫画源: 3250漫画 https://www.3250mh.com/
