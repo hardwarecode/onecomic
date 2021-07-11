@@ -16,6 +16,7 @@ class ManhuaguiCrawler(CrawlerBase):
 
     SITE = "manhuagui"
     SITE_INDEX = "https://www.manhuagui.com/"
+    DOMAIN = ".manhuagui.com"
     SOURCE_NAME = "漫画柜"
 
     IMAGE_URL_PREFIX = 'https://i.hamreus.com'
@@ -126,7 +127,7 @@ class ManhuaguiCrawler(CrawlerBase):
         return result
 
     def latest(self, page=1):
-        url = 'https://www.manhuagui.com/update/'
+        url = urljoin(self.SITE_INDEX, '/update/')
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for div in soup.find_all('div', {'class': 'latest-list'})[page - 1:page]:
@@ -146,7 +147,7 @@ class ManhuaguiCrawler(CrawlerBase):
 
     def get_tags(self):
         item = self.new_tags_item()
-        url = 'https://www.manhuagui.com/list/'
+        url = urljoin(self.SITE_INDEX, '/list/')
         soup = self.get_soup(url)
         div_list = soup.find('div', {'class': 'filter-nav'}).find_all('div', {'class': 'filter'})
         for idx, div in enumerate(div_list, start=1):
@@ -170,9 +171,9 @@ class ManhuaguiCrawler(CrawlerBase):
                 else:
                     params[0] = i
             query = '_'.join([i[1] for i in sorted(params.items(), key=lambda x: x[0])])
-            url = "https://www.manhuagui.com/list/%s/index_p%s.html" % (query, page)
+            url = urljoin(self.SITE_INDEX, '/list/%s/index_p%s.html' % (query, page))
         else:
-            url = 'https://www.manhuagui.com/list/index_p%s.html' % page
+            url = urljoin(self.SITE_INDEX, '/list/index_p%s.html' % (query, page))
 
         soup = self.get_soup(url)
         ul = soup.find('ul', {'id': 'contList'})
@@ -200,3 +201,11 @@ class ManhuaguiCrawler(CrawlerBase):
         session = self.get_session()
         if session.cookies.get("my", domain=".manhuagui.com"):
             return True
+
+
+class MhguiCrawler(ManhuaguiCrawler, CrawlerBase):
+    SITE = "mhgui"
+    SITE_INDEX = "https://www.mhgui.com/"
+    DOMAIN = ".mhgui.com"
+    SOURCE_NAME = "漫画柜"
+    IMAGE_URL_PREFIX = 'https://i.hamreus.com'

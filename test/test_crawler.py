@@ -61,6 +61,10 @@ def test_manhuagui():
     _test_crawl_comicbook(site='manhuagui')
 
 
+def test_mhgui():
+    _test_crawl_comicbook(site='mhgui')
+
+
 def test_18comic():
     _test_crawl_comicbook(site='18comic')
 
@@ -207,3 +211,7 @@ def test_3250mh():
 
 def test_boodo():
     _test_crawl_comicbook(site='boodo')
+
+
+def test_myfcomic():
+    _test_crawl_comicbook(site='myfcomic')
