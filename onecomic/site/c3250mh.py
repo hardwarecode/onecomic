@@ -61,6 +61,13 @@ class C3250mhCrawler(CrawlerBase):
         soup = self.get_soup(citem.source_url)
         image_urls = [div.img.get('src') for div in
                       soup.find('div', {'class': 'comiclist'}).find_all('div', {'class': 'comicpage'})]
+        pages = [i.get('value') for i in soup.find("select", {'class': "selectpage"}).find_all('option')]
+        for page in pages[1:]:
+            soup = self.get_soup(citem.source_url, params={'page': page})
+            image_urls.extend(
+                [div.img.get('src') for div in
+                 soup.find('div', {'class': 'comiclist'}).find_all('div', {'class': 'comicpage'})]
+            )
         return image_urls
 
     def latest(self, page=1):
