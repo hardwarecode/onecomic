@@ -436,11 +436,13 @@ class CrawlerBase(object):
         return self._TAGS_INFO
 
     def get_tag_id_by_name(self, name):
-        for group in self.get_tags_from_cache():
-            for tag in group['tags']:
-                if tag['name'] == name:
-                    return tag['tag']
-        return ''
+        result = []
+        for _name in name.split(','):
+            for group in self.get_tags_from_cache():
+                for tag in group['tags']:
+                    if tag['name'] == _name:
+                        result.append(tag['tag'])
+        return ','.join(result)
 
     @classmethod
     def chekc_node_modules(cls):
