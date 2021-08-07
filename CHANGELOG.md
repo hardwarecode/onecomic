@@ -1,5 +1,10 @@
 **unreleased**
+**v0.2.10**
+- 添加漫画源: 包子漫画 https://www.baozimh.com/
+
 **v0.2.9**
+- fix 3250漫画翻页
+
 **v0.2.8**
 - 添加漫画源: 漫番漫画 http://www.myfcomic.com/
 - 漫画柜其它域名支持 https://www.mhgui.com/
