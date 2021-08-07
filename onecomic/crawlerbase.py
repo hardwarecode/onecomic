@@ -441,7 +441,7 @@ class CrawlerBase(object):
             for group in self.get_tags_from_cache():
                 for tag in group['tags']:
                     if tag['name'] == _name:
-                        result.append(tag['tag'])
+                        result.append(str(tag['tag']))
         return ','.join(result)
 
     @classmethod
