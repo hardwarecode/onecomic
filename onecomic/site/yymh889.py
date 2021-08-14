@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 from PIL import Image
 
 from ..crawlerbase import CrawlerBase
-from ..image import ImageDownloader, retry, ImageDownloadError
+from ..image import ImageDownloader, image_download_retry, ImageDownloadError
 from ..utils import ensure_file_dir_exists
 
 logger = logging.getLogger(__name__)
@@ -145,7 +145,7 @@ class Yymh889Crawler(CrawlerBase):
 class Yymh889ImageDownloader(ImageDownloader):
     SITE = Yymh889Crawler.SITE
 
-    @retry(times=3, delay=1)
+    @image_download_retry(times=3, delay=1)
     def download_image(self, image_url, target_path, image_pipeline=None, headers=None, **kwargs):
         if self.is_image_exists(target_path):
             return target_path

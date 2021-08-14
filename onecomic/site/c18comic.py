@@ -1,6 +1,9 @@
 import re
 import logging
 from urllib.parse import urljoin
+import functools
+import hashlib
+import math
 
 from PIL import Image
 
@@ -70,6 +73,8 @@ class C18comicCrawler(CrawlerBase):
         html, soup = self.get_html_and_soup(citem.source_url)
         scramble_id = re.search(r'var scramble_id = (\d+);', html).group(1)
         aid = re.search(r'var aid = (\d+);', html).group(1)
+        readmode = re.search(r'var readmode = "(.*?)";', html).group(1)
+        speed = re.search(r'var speed = \'(.*?)\';', html).group(1)
         img_list = soup.find('div', 'row thumb-overlay-albums')\
             .find_all('img', {'id': re.compile(r'album_photo_\d+')})
         image_urls = []
@@ -78,37 +83,81 @@ class C18comicCrawler(CrawlerBase):
             url = img_soup.get('data-original')
             if not url:
                 url = img_soup.get('src')
-
-            if '.jpg' not in url or int(aid) < int(scramble_id):
-                image_pipelines.append(None)
-            else:
-                image_pipelines.append(self.image_pipeline)
-
             image_urls.append(url)
+            l = img_soup.parent.get('id').split('.')[0]
+            func = functools.partial(
+                self.scramble_image,
+                aid=aid, scramble_id=scramble_id, readmode=readmode, speed=speed, image_url=url, l=l)
+            image_pipelines.append(func)
         citem.image_pipelines = image_pipelines
         citem.image_urls = image_urls
         return citem
 
-    def image_pipeline(self, image_path):
+    def scramble_image(self, image_path, image_url, aid, scramble_id, readmode, speed, l):
+        """
+        JavaScript 语法：  context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
+        参数值
+        参数  描述
+        img 规定要使用的图像、画布或视频。
+        sx  可选。开始剪切的 x 坐标位置。
+        sy  可选。开始剪切的 y 坐标位置。
+        swidth  可选。被剪切图像的宽度。
+        sheight 可选。被剪切图像的高度。
+        x   在画布上放置图像的 x 坐标位置。
+        y   在画布上放置图像的 y 坐标位置。
+        width   可选。要使用的图像的宽度（伸展或缩小图像）。
+        height  可选。要使用的图像的高度（伸展或缩小图像）。
+        """
+        if readmode == 'read-by-page':
+            return
+        if '.jpg' not in image_url or int(aid) < int(scramble_id) or speed == '1':
+            return
         img = Image.open(image_path)
-        width, height = img.size
-        num = 10
-        one_piece = int(height / num)
-        regions = []
-        for i in range(num):
-            h_start = (one_piece * i)
-            h_end = (one_piece * (i + 1))
-            box = (0, h_start, width, h_end)
-            region = img.crop(box)
-            regions.append(region)
         new_img = Image.new(img.mode, img.size)
-        for i, region in enumerate(reversed(regions)):
-            h_start = (one_piece * i)
-            h_end = (one_piece * (i + 1))
-            box = (0, h_start, width, h_end)
-            new_img.paste(region, box=box)
+        width, height = img.size
+        i = height
+        d = width
+        o = d
+        s = self.get_num(aid, l)
+        r = int(i % s)
+        logger.debug('scramble_image aid=%s, scramble_id=%s, readmode=%s, speed=%s, l=%s s=%s', aid, scramble_id, readmode, speed, l, s)
+        for m in range(s):
+            c = math.floor(float(i) / s)
+            g = c * m
+            h = i - c * (m + 1) - r
+            if 0 == m:
+                c += r
+            else:
+                g += r
+            # a.drawImage(e, 0, h, o, c,   0, g, o, c)
+            box = (0, h, width, h + c)
+            new_box = (0, g, o, g + c)
+            region = img.crop(box)
+            new_img.paste(region, box=new_box)
         img.close()
         new_img.save(image_path, quality=95)
+
+    def get_num(self, e, t):
+        e = int(e)
+        a = 10
+        if e >= 268850:
+            n = str(e) + t
+            n = ord(hashlib.md5(str(n).encode()).hexdigest()[-1])
+            n %= 10
+            ret_map = {
+                0: 2,
+                1: 4,
+                2: 6,
+                3: 8,
+                4: 10,
+                5: 12,
+                6: 14,
+                7: 16,
+                8: 18,
+                9: 20,
+            }
+            return ret_map[n]
+        return a
 
     def search(self, name, page=1, size=None):
         url = urljoin(

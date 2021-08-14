@@ -16,14 +16,14 @@ PROJECT_HOME = os.path.abspath(os.path.join(HERE, os.path.pardir))
 logger = logging.getLogger(__name__)
 
 
-def retry(times=3, delay=0):
+def image_download_retry(times=3, delay=0):
     def _wrapper1(func):
         def _wrapper2(*args, **kwargs):
             i = 0
             while True:
                 try:
                     return func(*args, **kwargs)
-                except Exception as e:
+                except ImageDownloadError as e:
                     i += 1
                     if i > times:
                         raise e
@@ -60,7 +60,7 @@ class ImageDownloader(object):
                 pass
         return False
 
-    @retry(times=3, delay=1)
+    @image_download_retry(times=3, delay=1)
     def download_image(self, image_url, target_path, image_pipeline=None, headers=None, **kwargs):
         if self.is_image_exists(target_path):
             return target_path
