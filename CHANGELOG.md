@@ -1,4 +1,7 @@
 **unreleased**
+**v0.2.11**
+- 修复18comic撕裂图
+
 **v0.2.10**
 - 添加漫画源: 包子漫画 https://www.baozimh.com/
 
