@@ -1,4 +1,12 @@
 **unreleased**
+**v0.2.12**
+- 添加漫画源：BoyLove https://boylove.cc/
+- 添加漫画源：酷爱漫画 https://www.kuimh.com/
+- 支持自定义站点域名配置，User-Agent配置
+- 若干站点域名更新
+
+支持自定义站点域名配置、User-Agent配置
+
 **v0.2.11**
 - 修复18comic撕裂图
 
