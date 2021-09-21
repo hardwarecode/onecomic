@@ -114,9 +114,9 @@ class TwhentaiCrawler(CrawlerBase):
         return result
 
     def latest(self, page=1):
-        url = "http://twhentai.com/hentai_manga/"
+        url = urljoin(self.SITE_INDEX, "/hentai_manga/")
         if page > 1:
-            url = 'http://twhentai.com/hentai_manga/page_%s.html' % page
+            url = urljoin(self.SITE_INDEX, '/hentai_manga/page_%s.html' % page)
         soup = self.get_soup(url)
         return self.parse_book_list(soup)
 
@@ -134,16 +134,16 @@ class TwhentaiCrawler(CrawlerBase):
         if not tag:
             return self.latest(page=page)
         if page > 1:
-            url = 'http://twhentai.com/tag/%s/%s/' % (tag, page)
+            url = urljoin(self.SITE_INDEX, '/tag/%s/%s/' % (tag, page))
         else:
-            url = "http://twhentai.com/tag/%s/" % tag
+            url = urljoin(self.SITE_INDEX, "/tag/%s/" % tag)
         soup = self.get_soup(url)
         return self.parse_book_list(soup)
 
     def search(self, name, page, size=None):
         if page > 1:
-            url = 'http://twhentai.com/search/%s/%s/' % (name, page)
+            url = urljoin(self.SITE_INDEX, '/search/%s/%s/' % (name, page))
         else:
-            url = 'http://twhentai.com/search/%s/' % name
+            url = urljoin(self.SITE_INDEX, '/search/%s/' % name)
         soup = self.get_soup(url)
         return self.parse_book_list(soup)

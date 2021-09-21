@@ -53,7 +53,7 @@ class Qiman6Crawler(CrawlerBase):
                                        source_url=self.source_url)
         book.add_tag(name=tag, tag=tag)
 
-        api = "http://www.qiman6.com/bookchapter/"
+        api = urljoin(self.SITE_INDEX, "/bookchapter/")
         params = {'id': self.comicid, 'id2': 1}
         response = self.send_request('POST', api, data=params)
         api_data = response.json()

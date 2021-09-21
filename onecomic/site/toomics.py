@@ -44,7 +44,7 @@ class ToomicsCrawler(CrawlerBase):
 
     def get_source_url(self, comicid):
         a, b = comicid.split('-')
-        return 'https://toomics.com/%s/webtoon/episode/toon/%s' % (a, b)
+        return urljoin(self.SITE_INDEX, '/%s/webtoon/episode/toon/%s' % (a, b))
 
     def get_comicbook_item(self):
         soup = self.get_soup(self.source_url)
@@ -96,7 +96,7 @@ class ToomicsCrawler(CrawlerBase):
         return self.get_tag_result(tag=None, page=page)
 
     def get_tags(self):
-        url = 'https://toomics.com/sc/webtoon/ranking'
+        url = urljoin(self.SITE_INDEX, '/sc/webtoon/ranking')
         soup = self.get_soup(url)
         tags = self.new_tags_item()
         category = '分类列表'
@@ -115,9 +115,9 @@ class ToomicsCrawler(CrawlerBase):
         if page >= 2:
             return self.new_search_result_item()
         if not tag:
-            url = 'https://toomics.com/sc/webtoon/ranking/'
+            url = urljoin(self.SITE_INDEX, '/sc/webtoon/ranking/')
         else:
-            url = 'https://toomics.com/sc/webtoon/ranking/genre/%s' % tag
+            url = urljoin(self.SITE_INDEX, '/sc/webtoon/ranking/genre/%s' % tag)
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('div', {'class': 'list_wrap'}).find_all('li'):

@@ -28,7 +28,7 @@ class QQCrawler(CrawlerBase):
         return self.get_source_url(self.comicid)
 
     def get_source_url(self, comicid):
-        return 'https://ac.qq.com/Comic/ComicInfo/id/{}'.format(comicid)
+        return urljoin(self.SITE_INDEX, '/Comic/ComicInfo/id/{}'.format(comicid))
 
     def get_index_page(self):
         if self.index_page is None:
@@ -88,7 +88,7 @@ class QQCrawler(CrawlerBase):
         return image_urls
 
     def search(self, name, page=1, size=None):
-        url = "https://ac.qq.com/Comic/searchList/search/{}/page/{}".format(name, page)
+        url = urljoin(self.SITE_INDEX, "/Comic/searchList/search/{}/page/{}".format(name, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         ul = soup.find('ul', {'class': 'mod_book_list mod_all_works_list mod_of'})
@@ -105,7 +105,7 @@ class QQCrawler(CrawlerBase):
         return result
 
     def latest(self, page=1):
-        url = 'https://ac.qq.com/Comic/all/search/time/page/%s' % page
+        url = urljoin(self.SITE_INDEX, '/Comic/all/search/time/page/%s' % page)
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find_all('li', {'class': 'ret-search-item clearfix'}):
@@ -122,7 +122,7 @@ class QQCrawler(CrawlerBase):
 
     def get_tags(self):
         tags = self.new_tags_item()
-        url = 'https://ac.qq.com/Comic/all/search/hot/page/1'
+        url = urljoin(self.SITE_INDEX, '/Comic/all/search/hot/page/1')
         html, soup = self.get_html_and_soup(url)
         for div in soup.find_all('div', {'class': 'ret-tags-type'}):
             category = div.h3.text
@@ -142,10 +142,10 @@ class QQCrawler(CrawlerBase):
 
     def get_tag_result(self, tag, page=1):
         if not tag:
-            url = 'https://ac.qq.com/Comic/all/search/hot/page/%s' % page
+            url = urljoin(self.SITE_INDEX, '/Comic/all/search/hot/page/%s' % page)
         else:
             # url = "https://ac.qq.com/Comic/all/theme/%s/finish/%s/search/hot/vip/%s/page/%s"
-            url = "https://ac.qq.com/Comic/all"
+            url = urljoin(self.SITE_INDEX, "/Comic/all")
             params = {}
             for i in tag.split(','):
                 key, tag_id = i.split('_', 1)

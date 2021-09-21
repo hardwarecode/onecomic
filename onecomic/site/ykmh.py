@@ -77,13 +77,13 @@ class YkmhCrawler(CrawlerBase):
         return result
 
     def latest(self, page=1):
-        url = "https://www.ykmh.com/update/"
+        url = urljoin(self.SITE_INDEX, "/update/")
         if page > 1:
-            url = "https://www.ykmh.com/update/%s/" % page
+            url = urljoin(self.SITE_INDEX, "/update/%s/" % page)
         soup = self.get_soup(url)
         return self.parser_book_list(soup)
 
     def search(self, name, page=1):
-        url = "https://www.ykmh.com/search/?keywords=%s&page=%s" % (name, page)
+        url = urljoin(self.SITE_INDEX, "/search/?keywords=%s&page=%s" % (name, page))
         soup = self.get_soup(url)
         return self.parser_book_list(soup)

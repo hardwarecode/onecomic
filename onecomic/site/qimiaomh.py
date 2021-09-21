@@ -42,22 +42,8 @@ class QimiaomhCrawler(CrawlerBase):
                                        author=author,
                                        source_url=self.source_url)
 
-        api = "http://www.qiman6.com/bookchapter/"
-        params = {'id': self.comicid, 'id2': 1}
-        response = self.send_request('POST', api, data=params)
-        api_data = response.json()
-        current = 1
-        for chapter_number, item in enumerate(reversed(api_data), start=1):
-            chapterid = item['chapterid']
-            url = urljoin(self.SITE_INDEX, '/{}/{}.html'.format(self.comicid, chapterid))
-            title = item['chaptername']
-            book.add_chapter(chapter_number=chapter_number,
-                             source_url=url,
-                             title=title)
-            current += 1
-
         ul_list = soup.find('div', {'class': 'comic-content-list'}).find_all('ul')
-        for chapter_number, ul in enumerate(reversed(ul_list), start=current):
+        for chapter_number, ul in enumerate(reversed(ul_list), start=1):
             href = ul.find('li', {'class': 'cimg'}).a.get('href')
             sid = re.search(r'/manhua/\d+/(\d+)\.html', href).group(1)
             url = urljoin(self.SITE_INDEX, href)
@@ -66,12 +52,14 @@ class QimiaomhCrawler(CrawlerBase):
                              source_url=url,
                              title=title,
                              sid=sid)
-
         return book
 
     def get_chapter_image_urls(self, citem):
-        api_url = 'https://www.qimiaomh.com/Action/Play/AjaxLoadImgUrl?did=%s&sid=%s&tmp=%s' % (
-            self.comicid, citem.sid, random.random())
+        api_url = urljoin(
+            self.SITE_INDEX,
+            '/Action/Play/AjaxLoadImgUrl?did=%s&sid=%s&tmp=%s' % (
+                self.comicid, citem.sid, random.random())
+        )
         api_data = self.get_json(api_url)
         image_urls = api_data['listImg']
         return image_urls
@@ -146,12 +134,14 @@ class QimiaomhCrawler(CrawlerBase):
                 diqu = t.replace('diqu_', '')
             elif t.startswith('zhuangtai_'):
                 zhuangtai = t.replace('zhuangtai_', '')
-        url = 'https://www.qimiaomh.com/list-1-{ticai}-{diqu}----updatetime-{zhuangtai}-{page}.html'\
-            .format(ticai=ticai, diqu=diqu, zhuangtai=zhuangtai, page=page)
+        url = urljoin(
+            self.SITE_INDEX,
+            '/list-1-{ticai}-{diqu}----updatetime-{zhuangtai}-{page}.html'.format(ticai=ticai, diqu=diqu, zhuangtai=zhuangtai, page=page)
+        )
         soup = self.get_soup(url)
         return self.parse_book_list(soup)
 
     def search(self, name, page=1, size=None):
-        url = "https://www.qimiaomh.com/action/Search?keyword=%s&page=%s" % (name, page)
+        url = urljoin(self.SITE_INDEX, "/action/Search?keyword=%s&page=%s" % (name, page))
         soup = self.get_soup(url)
         return self.parse_book_list(soup)

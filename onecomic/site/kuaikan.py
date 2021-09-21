@@ -99,7 +99,7 @@ class KuaiKanCrawler(CrawlerBase):
 
     def latest(self, page=1):
         pos = page - 1
-        url = 'https://www.kuaikanmanhua.com/v2/pweb/daily/topics?pos=%s' % pos
+        url = urljoin(self.SITE_INDEX, '/v2/pweb/daily/topics?pos=%s' % pos)
         data = self.get_json(url)
         result = self.new_search_result_item()
         for i in data['data']['topics']:
@@ -114,7 +114,7 @@ class KuaiKanCrawler(CrawlerBase):
         return result
 
     def get_tags(self):
-        url = "https://www.kuaikanmanhua.com/tag/0?state=1&sort=1&page=1"
+        url = urljoin(self.SITE_INDEX, "/tag/0?state=1&sort=1&page=1")
         html = self.get_html(url)
         data = self.parse_api_data_from_page(html)
         tags = self.new_tags_item()
@@ -139,7 +139,7 @@ class KuaiKanCrawler(CrawlerBase):
                 key, value = i.rsplit('_', 1)
                 params[key] = value
         tag_id = params.pop('tag_id', 0)
-        url = 'https://www.kuaikanmanhua.com/tag/%s' % tag_id
+        url = urljoin(self.SITE_INDEX, '/tag/%s' % tag_id)
         html = self.get_html(url, params=params)
         data = self.parse_api_data_from_page(html)
         result = self.new_search_result_item()

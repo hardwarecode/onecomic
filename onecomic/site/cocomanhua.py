@@ -98,12 +98,12 @@ class CocomanhuaCrawler(CrawlerBase):
         return result
 
     def latest(self, page=1):
-        url = "https://www.cocomanhua.com/show?orderBy=update&page=%s" % page
+        url = urljoin(self.SITE_INDEX, "/show?orderBy=update&page=%s" % page)
         soup = self.get_soup(url)
         return self.get_book_by_page(soup)
 
     def get_tags(self):
-        url = "https://www.cocomanhua.com/show?orderBy=update"
+        url = urljoin(self.SITE_INDEX, "/show?orderBy=update")
         soup = self.get_soup(url)
         dl = soup.find("div", {"class": 'fed-casc-list fed-part-rows'}).find_all('dl')[1]
         tags = self.new_tags_item()
@@ -117,12 +117,12 @@ class CocomanhuaCrawler(CrawlerBase):
         return tags
 
     def get_tag_result(self, tag, page):
-        url = 'https://www.cocomanhua.com/show?mainCategoryId=%s&orderBy=update&page=%s' % (tag, page)
+        url = urljoin(self.SITE_INDEX, '/show?mainCategoryId=%s&orderBy=update&page=%s' % (tag, page))
         soup = self.get_soup(url)
         return self.get_book_by_page(soup)
 
     def search(self, name, page, size=None):
-        url = "https://www.cocomanhua.com/search?searchString=%s&page=%s" % (name, page)
+        url = urljoin(self.SITE_INDEX, "/search?searchString=%s&page=%s" % (name, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for dl in soup.find_all('dl'):

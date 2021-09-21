@@ -71,10 +71,10 @@ class QootoonCrawler(CrawlerBase):
     def get_chapter_image_urls(self, citem):
         url = urljoin(
             self.SITE_INDEX,
-            'https://www.qootoon.net/comic/episode_view?episode_idx=%s' % citem.episode
+            '/comic/episode_view?episode_idx=%s' % citem.episode
         )
         headers = {
-            'referer': 'https://www.qootoon.net/',
+            'referer': self.SITE_INDEX,
             'sec-fetch-site': 'same-origin',
         }
         soup = self.get_soup(url, headers=headers)
@@ -95,7 +95,7 @@ class QootoonCrawler(CrawlerBase):
     def latest(self, page):
         if page >= 2:
             return self.new_search_result_item()
-        url = 'https://www.qootoon.net/page/complete?data=new'
+        url = urljoin(self.SITE_INDEX, '/page/complete?data=new')
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for div in soup.find('div', {'id': 'list_data_cut'}).find_all('div', recursive=False):

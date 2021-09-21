@@ -35,7 +35,7 @@ class NsfwpicxCrawler(CrawlerBase):
         return self.get_source_url(self.comicid.replace('-', '/'))
 
     def get_source_url(self, comicid):
-        return urljoin(self.SITE_INDEX, 'http://kkoo.icu/%s.html' % comicid)
+        return urljoin(self.SITE_INDEX, '/%s.html' % comicid)
 
     def get_comicbook_item(self):
         soup = self.get_soup(self.source_url)

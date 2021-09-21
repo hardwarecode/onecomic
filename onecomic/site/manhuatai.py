@@ -73,7 +73,7 @@ class ManhuataiCrawler(CrawlerBase):
             'comic_id': citem.comic_id,
             'chapter_newid': citem.chapter_newid,
         }
-        url = "https://www.manhuatai.com/api/getchapterinfo"
+        url = urljoin(self.SITE_INDEX, "/api/getchapterinfo")
         data = self.get_json(url, params=params)
         image_urls = []
         prefix = "https://mhpic.jumanhua.com"
@@ -88,7 +88,7 @@ class ManhuataiCrawler(CrawlerBase):
         if page > 1:
             self.new_search_result_item()
         result = self.new_search_result_item()
-        url = "https://www.manhuatai.com/gengxin/"
+        url = urljoin(self.SITE_INDEX, "/gengxin/")
         soup = self.get_soup(url)
         div_list = soup.find_all('div', {'class': 'J_weekDataList'})
         for div in div_list:

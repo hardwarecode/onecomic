@@ -68,7 +68,7 @@ class Acg456Crawler(CrawlerBase):
     def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
         cid = re.search(r'var c = (\d+);', html).group(1)
-        api_url = 'http://www.acg456.com/ajax/Common.ashx'
+        api_url = urljoin(self.SITE_INDEX, '/ajax/Common.ashx')
         params = dict(op='getPics', cid=cid, path=citem.cid, _=int(time.time()))
         data = self.get_json(api_url, params=params)
         image_urls = data['data']
@@ -104,7 +104,7 @@ class Acg456Crawler(CrawlerBase):
         return tags
 
     def get_tag_result(self, tag, page=1):
-        url = 'http://www.acg456.com/Catalog/?tid=%s&PageIndex=%s' % (tag, page)
+        url = urljoin(self.SITE_INDEX, '/Catalog/?tid=%s&PageIndex=%s' % (tag, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for ul in soup.find_all('ul', {'class': 'Comic_Pic_List'}):

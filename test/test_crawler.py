@@ -205,8 +205,8 @@ def test_qiman6():
     _test_crawl_comicbook(site='qiman6')
 
 
-def test_3250mh():
-    _test_crawl_comicbook(site='3250mh')
+# def test_3250mh():
+#     _test_crawl_comicbook(site='3250mh')
 
 
 def test_boodo():
@@ -215,3 +215,15 @@ def test_boodo():
 
 def test_myfcomic():
     _test_crawl_comicbook(site='myfcomic')
+
+
+def test_baozimh():
+    _test_crawl_comicbook(site='baozimh')
+
+
+def test_boylove():
+    _test_crawl_comicbook(site='boylove')
+
+
+def test_kuimh():
+    _test_crawl_comicbook(site='kuimh')

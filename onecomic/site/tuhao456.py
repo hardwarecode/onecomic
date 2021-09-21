@@ -129,7 +129,7 @@ class Tuhao456Crawler(CrawlerBase):
         return result
 
     def search(self, name, page, size=None):
-        url = "https://www.tuhao456.com/sort/?key=%s&button=搜索" % name
+        url = urljoin(self.SITE_INDEX, "/sort/?key=%s&button=搜索" % name)
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for ul in soup.find('div', {'class': 'cy_list_mh'}).find_all('ul'):

@@ -91,7 +91,7 @@ class DM5Crawler(CrawlerBase):
             mid = re.search(r'var COMIC_MID = (\d*);', html).group(1)
             is_end_page = False
             page = 1
-            api_url = "https://www.dm5.com/m%s/chapterfun.ashx" % citem.cid
+            api_url = urljoin(self.SITE_INDEX, "/m%s/chapterfun.ashx" % citem.cid)
             added = set()
             while not is_end_page:
                 params = {
@@ -127,7 +127,7 @@ class DM5Crawler(CrawlerBase):
     def latest(self, page=1):
         if page > 1:
             return self.new_search_result_item()
-        url = 'https://www.dm5.com/manhua-new/'
+        url = urljoin(self.SITE_INDEX, '/manhua-new/')
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('ul', {'class': 'mh-list col7'}).find_all('li'):
@@ -145,7 +145,7 @@ class DM5Crawler(CrawlerBase):
         return result
 
     def get_tags(self):
-        url = 'https://www.dm5.com/manhua-list/'
+        url = urljoin(self.SITE_INDEX, '/manhua-list/')
         soup = self.get_soup(url)
         tags = self.new_tags_item()
         category = '题材'
@@ -161,9 +161,9 @@ class DM5Crawler(CrawlerBase):
         if not tag.isdigit():
             tag = self.get_tag_id_by_name(tag)
         if not tag:
-            url = "https://www.dm5.com/manhua-list-p%s/" % page
+            url = urljoin(self.SITE_INDEX, "/manhua-list-p%s/" % page)
         else:
-            url = "https://www.dm5.com/manhua-list-tag%s-p%s/" % (tag, page)
+            url = urljoin(self.SITE_INDEX, "/manhua-list-tag%s-p%s/" % (tag, page))
         soup = self.get_soup(url)
         for li in soup.find('ul', {'class': 'mh-list col7'}).find_all('li'):
             href = li.h2.a.get('href')
@@ -179,7 +179,7 @@ class DM5Crawler(CrawlerBase):
         return result
 
     def search(self, name, page, size=None):
-        url = "https://www.dm5.com/search?title=%s&page=%s" % (name, page)
+        url = urljoin(self.SITE_INDEX, "/search?title=%s&page=%s" % (name, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         try:

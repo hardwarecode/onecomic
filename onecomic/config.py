@@ -21,6 +21,8 @@ class CrawlerConfig(object):
     IMAGE_TIMEOUT = 'image_timeout'
     CRAWLER_TIMEOUT = 'crawler_timeout'
     CRAWLER_DELAY = 'crawler_delay'
+    SITE_INDEX = 'site_index'
+    USER_AGENT = 'user_agent'
 
     DEFAULT_VALUE = {
         DOWNLOAD_DIR: 'download',
@@ -33,6 +35,8 @@ class CrawlerConfig(object):
         IMAGE_TIMEOUT: 30,
         CRAWLER_TIMEOUT: 30,
         CRAWLER_DELAY: 0,
+        SITE_INDEX: '',
+        USER_AGENT: '',
     }
 
     TO_ENV_KEY = {
@@ -47,7 +51,7 @@ class CrawlerConfig(object):
         WORKER: 'ONECOMIC_WORKER',
         IMAGE_TIMEOUT: 'ONECOMIC_IMAGE_TIMEOUT',
         CRAWLER_TIMEOUT: 'ONECOMIC_CRAWLER_TIMEOUT',
-        CRAWLER_DELAY: 'ONECOMIC_CRAWLER_DELAY'
+        CRAWLER_DELAY: 'ONECOMIC_CRAWLER_DELAY',
     }
 
     def __init__(self, args=None):
@@ -55,10 +59,13 @@ class CrawlerConfig(object):
         self.config = deepcopy(self.DEFAULT_VALUE)
         self.config.update(self.read_config(self.get_config_file()))
 
+        # 先从环境便令获取
         for key in self.TO_ENV_KEY:
             value = os.environ.get(self.TO_ENV_KEY[key])
             if value:
                 self.config[key] = value
+
+        # 从命令行获取参数 优先级高
         if args:
             for key in args.__dict__:
                 value = getattr(args, key)
@@ -98,6 +105,13 @@ class CrawlerConfig(object):
         if not proxy:
             proxy = os.environ.get('ONECOMIC_PROXY_{}'.format(site.upper()))
         return proxy
+
+    def get_site_index(self, site):
+        site_index = self.config[self.SITE_INDEX]
+        if site_index:
+            return site_index
+        site_index = self.config.get(f'site_index_{site}', '')
+        return site_index
 
     def get_cookies_path(self, site):
         cookies_path = None
@@ -151,3 +165,7 @@ class CrawlerConfig(object):
     @property
     def crawler_delay(self):
         return int(self.config[self.CRAWLER_DELAY])
+
+    @property
+    def user_agent(self):
+        return self.config[self.USER_AGENT]

@@ -85,9 +85,9 @@ class DmzjCrawler(CrawlerBase):
 
     def latest(self, page=1):
         if page == 1:
-            url = "https://www.dmzj.com/update/"
+            url = urljoin(self.SITE_INDEX, "/update/")
         else:
-            url = "https://www.dmzj.com/update/%s.html" % page
+            url = urljoin(self.SITE_INDEX, "/update/%s.html" % page)
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('ul', {'class': 'list_con_li'}).find_all('li'):
@@ -109,7 +109,7 @@ class DmzjCrawler(CrawlerBase):
         return result
 
     def get_tags(self):
-        url = 'https://www.dmzj.com/category'
+        url = urljoin(self.SITE_INDEX, '/category')
         soup = self.get_soup(url)
         tags = self.new_tags_item()
         for div in soup.find_all('div', {'class': 'public_com'}):
@@ -123,7 +123,7 @@ class DmzjCrawler(CrawlerBase):
         return tags
 
     def get_tag_result(self, tag, page=1):
-        url = 'https://www.dmzj.com/category/%s-%s.html' % (tag, page)
+        url = urljoin(self.SITE_INDEX, '/category/%s-%s.html' % (tag, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('ul', {'class': 'list_con_li'}).find_all('li'):
@@ -144,7 +144,7 @@ class DmzjCrawler(CrawlerBase):
         return result
 
     def search(self, name, page, size=None):
-        url = 'https://www.dmzj.com/dynamic/o_search/index/%s/%s' % (name, page)
+        url = urljoin(self.SITE_INDEX, '/dynamic/o_search/index/%s/%s' % (name, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('ul', {'class': 'update_con autoHeight'}).find_all('li'):

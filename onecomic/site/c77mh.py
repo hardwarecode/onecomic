@@ -81,7 +81,7 @@ class C77mhCrawler(CrawlerBase):
     def latest(self, page=1):
         if page > 1:
             return self.new_search_result_item()
-        url = "https://www.77mh.cc/new_coc.html"
+        url = urljoin(self.SITE_INDEX, "/new_coc.html")
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('div', {'class': 'ar_list_co'}).find_all('li'):
@@ -109,9 +109,9 @@ class C77mhCrawler(CrawlerBase):
 
     def get_tag_result(self, tag, page=1):
         if page == 1:
-            url = "https://www.77mh.cc/%s/index.html" % tag
+            url = urljoin(self.SITE_INDEX, "/%s/index.html" % tag)
         else:
-            url = "https://www.77mh.cc/%s/index_%s.html" % (tag, page - 1)
+            url = urljoin(self.SITE_INDEX, "/%s/index_%s.html" % (tag, page - 1))
 
         soup = self.get_soup(url)
         result = self.new_search_result_item()

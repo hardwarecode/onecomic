@@ -104,7 +104,7 @@ class BoodoCrawler(CrawlerBase):
         return self.parse_book_list(soup)
 
     def get_tags(self):
-        url = 'https://boodo.qq.com/pages/category.html?categoryType=1&category=0'
+        url = urljoin(self.SITE_INDEX, '/pages/category.html?categoryType=1&category=0')
         soup = self.get_soup(url)
         tags = self.new_tags_item()
         for a in soup.find('div', {'class': 'mod-categorybar'}).ul.li.find_all('a'):
@@ -130,7 +130,10 @@ class BoodoCrawler(CrawlerBase):
         return result
 
     def get_tag_result(self, tag, page=1):
-        url = "https://boodo.qq.com/pages/category.html?categoryType=1&category=%s&page=%s" % (tag, page)
+        url = urljoin(
+            self.SITE_INDEX,
+            "/pages/category.html?categoryType=1&category=%s&page=%s" % (tag, page)
+        )
         soup = self.get_soup(url)
         return self.parse_book_list(soup)
 
@@ -138,7 +141,7 @@ class BoodoCrawler(CrawlerBase):
         if page > 1:
             return self.new_search_result_item()
 
-        url = "https://boodo.qq.com/pages/search.html?keyword=%s" % name
+        url = urljoin(self.SITE_INDEX, "/pages/search.html?keyword=%s" % name)
         html = self.get_html(url)
         js_str = re.search(r'<script>window\.__INITIAL_STATE__=(.*?)</script>', html).group(1)
         data = json.loads(js_str)

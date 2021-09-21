@@ -14,7 +14,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 class LaimanhuaCrawler(CrawlerBase):
 
     SITE = "laimanhua"
-    SITE_INDEX = 'https://www.laimanhua.com/'
+    SITE_INDEX = 'https://www.laimanhua.net/'
     SOURCE_NAME = "来漫画"
 
     DEFAULT_COMICID = '10109'
@@ -78,7 +78,7 @@ class LaimanhuaCrawler(CrawlerBase):
         return image_urls
 
     def latest(self, page=1):
-        url = "https://www.laimanhua.com/kanmanhua/zaixian_recent.html"
+        url = urljoin(self.SITE_INDEX, "/kanmanhua/zaixian_recent.html")
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('div', {'class': 'updateList clearfix'}).ul.find_all('li'):
@@ -111,7 +111,7 @@ class LaimanhuaCrawler(CrawlerBase):
         if page > 1:
             return self.new_search_result_item()
 
-        search_url = "https://www.laimanhua.com/cse/search/"
+        search_url = urljoin(self.SITE_INDEX, "/cse/search/")
         params = {
             'key': name.encode(self.SITE_ENCODEING),
             'page': page,
@@ -151,6 +151,6 @@ class LaimanhuaCrawler(CrawlerBase):
     def get_tag_result(self, tag, page):
         if not tag:
             return self.latest(page=page)
-        url = "https://www.laimanhua.com/kanmanhua/%s/%s.html" % (tag, page)
+        url = urljoin(self.SITE_INDEX, "/kanmanhua/%s/%s.html" % (tag, page))
         soup = self.get_soup(url)
         return self.parser_book_list(soup)

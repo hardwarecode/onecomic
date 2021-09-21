@@ -99,7 +99,7 @@ class C55comicCrawler(CrawlerBase):
                 area = '1'
             else:
                 tag_id = tag_name
-        url = 'https://www.55comic.com/booklist?tag=%s&area=%s&end=%s&page=%s' % (tag_id, area, end, page)
+        url = urljoin(self.SITE_INDEX, '/booklist?tag=%s&area=%s&end=%s&page=%s' % (tag_id, area, end, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('ul', {'class': 'cartoon-hot-ul cartoon-classify-ul'}).find_all('li'):
@@ -115,7 +115,7 @@ class C55comicCrawler(CrawlerBase):
         return result
 
     def search(self, name, page, size=None):
-        url = "https://www.55comic.com/search?keyword=%s" % name
+        url = urljoin(self.SITE_INDEX, "/search?keyword=%s" % name)
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('ul', {'class': 'mh-list col7'}).find_all('li'):

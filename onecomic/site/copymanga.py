@@ -73,7 +73,7 @@ class CopymangaCrawler(CrawlerBase):
             book.add_tag(name=tag_name, tag=tag_id)
         for chapter_number, item in enumerate(self.get_chapters(self.comicid), start=1):
             uuid = item['uuid']
-            url = "https://copymanga.com/comic/%s/chapter/%s" % (self.comicid, uuid)
+            url = urljoin(self.SITE_INDEX, "/comic/%s/chapter/%s" % (self.comicid, uuid))
             title = item['name']
             book.add_chapter(chapter_number=chapter_number,
                              source_url=url,
@@ -106,7 +106,7 @@ class CopymangaCrawler(CrawlerBase):
         return self.get_tag_result(tag=None, page=page)
 
     def get_tags(self):
-        url = 'https://copymanga.com/comics'
+        url = urljoin(self.SITE_INDEX, '/comics')
         soup = self.get_soup(url)
         tags = self.new_tags_item()
         category = '分类列表'
@@ -123,17 +123,20 @@ class CopymangaCrawler(CrawlerBase):
         limit = 50
         offset = (page - 1) * limit
         if not tag:
-            url = 'https://copymanga.com/comics?offset=%s&limit=%s' % (offset, limit)
+            url = urljoin(self.SITE_INDEX, '/comics?offset=%s&limit=%s' % (offset, limit))
         else:
-            url = 'https://copymanga.com/comics?theme=%s&offset=%s&limit=%s' % (tag, offset, limit)
+            url = urljoin(self.SITE_INDEX, '/comics?theme=%s&offset=%s&limit=%s' % (tag, offset, limit))
         soup = self.get_soup(url)
         return self.get_chapter_from_page(soup)
 
     def search(self, name, page, size=None):
         limit = 20
         offset = (page - 1) * limit
-        api_url = "https://copymanga.com/api/kb/web/searchc/comics?offset=%s&platform=2&limit=%s&q=%s&q_type="
-        url = api_url % (offset, limit, name)
+        url = urljoin(
+            self.SITE_INDEX,
+            "/api/kb/web/searchs/comics?offset=%s&platform=2&limit=%s&q=%s&q_type=" % (offset, limit, name)
+        )
+
         data = self.get_json(url)
         result = self.new_search_result_item()
         for i in data['results']['list']:

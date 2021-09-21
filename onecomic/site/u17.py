@@ -1,6 +1,7 @@
 import urllib.parse
 import logging
 import re
+from urllib.parse import urljoin
 
 from ..crawlerbase import CrawlerBase
 
@@ -34,7 +35,7 @@ class U17Crawler(CrawlerBase):
         return self.get_source_url(self.comicid)
 
     def get_source_url(self, comicid):
-        return "https://www.u17.com/comic/{}.html".format(comicid)
+        return urljoin(self.SITE_INDEX, "/comic/{}.html".format(comicid))
 
     def get_comicbook_item(self):
         url = self.COMIC_BOOK_API.format(comicid=self.comicid)
@@ -93,7 +94,7 @@ class U17Crawler(CrawlerBase):
         return result
 
     def latest(self, page=1):
-        url = 'https://www.u17.com/comic/ajax.php?mod=comic_list&act=comic_list_new_fun&a=get_comic_list'
+        url = urljoin(self.SITE_INDEX, '/comic/ajax.php?mod=comic_list&act=comic_list_new_fun&a=get_comic_list')
         params = {
             'data[order]': 1,
             'data[page_num]': page,
@@ -121,7 +122,7 @@ class U17Crawler(CrawlerBase):
         return result
 
     def get_tags(self):
-        url = "https://www.u17.com/comic_list/th99_gr99_ca99_ss99_ob0_ac0_as0_wm0_co99_ct99_p1.html?order=2"
+        url = urljoin(self.SITE_INDEX, "/comic_list/th99_gr99_ca99_ss99_ob0_ac0_as0_wm0_co99_ct99_p1.html?order=2")
         soup = self.get_soup(url)
         tags = self.new_tags_item()
         for div in soup.find_all('div', {'class': 'categray_box'}):
@@ -133,7 +134,7 @@ class U17Crawler(CrawlerBase):
         return tags
 
     def get_tag_result(self, tag, page):
-        url = 'https://www.u17.com/comic/ajax.php?mod=comic_list&act=comic_list_new_fun&a=get_comic_list'
+        url = urljoin(self.SITE_INDEX, '/comic/ajax.php?mod=comic_list&act=comic_list_new_fun&a=get_comic_list')
         params = {
             'data[order]': 1,
             'data[page_num]': page,

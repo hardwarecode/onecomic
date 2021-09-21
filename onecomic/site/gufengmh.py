@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 class Gufengmh8Crawler(CrawlerBase):
 
-    SITE = "gufengmh8"
-    SITE_INDEX = 'https://www.gufengmh8.com/'
+    SITE = "gufengmh"
+    SITE_INDEX = 'https://www.gufengmh9.com/'
     SOURCE_NAME = "古风漫画网"
     LOGIN_URL = SITE_INDEX
 

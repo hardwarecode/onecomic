@@ -108,7 +108,7 @@ class JmzjCrawler(CrawlerBase):
 
     def latest(self, page=1):
         if page > 1:
-            url = "http://jmzj.xyz/label/update/page/%s.html" % page
+            url = urljoin(self.SITE_INDEX, "/label/update/page/%s.html" % page)
         else:
             url = urljoin(self.SITE_INDEX, "/label/update.html")
         soup = self.get_soup(url)
@@ -140,17 +140,17 @@ class JmzjCrawler(CrawlerBase):
 
     def get_tag_result(self, tag, page=1):
         if page > 1:
-            url = 'http://jmzj.xyz/booktype/5--%s---%s.html' % (tag, page)
+            url = urljoin(self.SITE_INDEX, '/booktype/5--%s---%s.html' % (tag, page))
         else:
-            url = 'http://jmzj.xyz/booktype/5--%s---.html' % (tag)
+            url = urljoin(self.SITE_INDEX, '/booktype/5--%s---.html' % (tag))
         soup = self.get_soup(url)
         soup = self.get_soup(url)
         return self.parser_book_list(soup)
 
     def search(self, name, page, size=None):
         if page > 1:
-            url = 'http://jmzj.xyz/search/%s------%s-.html' % (name, page)
+            url = urljoin(self.SITE_INDEX, '/search/%s------%s-.html' % (name, page))
         else:
-            url = 'http://jmzj.xyz/search/-------.html?wd=%s' % name
+            url = urljoin(self.SITE_INDEX, '/search/-------.html?wd=%s' % name)
         soup = self.get_soup(url)
         return self.parser_book_list(soup)

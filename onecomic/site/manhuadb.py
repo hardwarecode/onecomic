@@ -86,9 +86,9 @@ class ManhuadbCrawler(CrawlerBase):
 
     def latest(self, page=1):
         if page == 1:
-            url = 'https://www.manhuadb.com/update.html'
+            url = urljoin(self.SITE_INDEX, '/update.html')
         else:
-            url = "https://www.manhuadb.com/update_%s.html" % page
+            url = urljoin(self.SITE_INDEX, "/update_%s.html" % page)
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for div in soup.find_all('div', {'class': 'comicbook-index'}):
@@ -104,7 +104,7 @@ class ManhuadbCrawler(CrawlerBase):
         return result
 
     def get_tags(self):
-        url = "https://www.manhuadb.com/manhua/list.html"
+        url = urljoin(self.SITE_INDEX, "/manhua/list.html")
         soup = self.get_soup(url)
         tags = self.new_tags_item()
         category = '分类'
@@ -123,9 +123,9 @@ class ManhuadbCrawler(CrawlerBase):
             tag = tag_id
         tag = tag.replace(',', '-')
         if page == 1:
-            url = "https://www.manhuadb.com/manhua/list-%s.html" % (tag)
+            url = urljoin(self.SITE_INDEX, "/manhua/list-%s.html" % tag)
         else:
-            url = "https://www.manhuadb.com/manhua/list-%s-page-%s.html" % (tag, page)
+            url = urljoin(self.SITE_INDEX, "/manhua/list-%s-page-%s.html" % (tag, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for div in soup.find_all('div', {'class': 'media comic-book-unit'}):
@@ -141,7 +141,7 @@ class ManhuadbCrawler(CrawlerBase):
         return result
 
     def search(self, name, page, size=None):
-        url = "https://www.manhuadb.com/search?q=%s&p=%s" % (name, page)
+        url = urljoin(self.SITE_INDEX, "/search?q=%s&p=%s" % (name, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for div in soup.find_all('div', {'class': 'comicbook-index'}):

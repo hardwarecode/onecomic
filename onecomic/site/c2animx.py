@@ -148,9 +148,9 @@ class C2animxCrawler(CrawlerBase):
     def get_tag_result(self, tag, page=1):
         if not tag:
             if page > 1:
-                url = 'https://www.2animx.com/index.php?s=%2Findex-html&page={}'.format(page)
+                url = urljoin(self.SITE_INDEX, '/index.php?s=%2Findex-html&page={}'.format(page))
             else:
-                url = 'https://www.2animx.com/index-html'
+                url = urljoin(self.SITE_INDEX, '/index-html')
         else:
             status = '0'
             typeid = '0'
@@ -160,19 +160,28 @@ class C2animxCrawler(CrawlerBase):
                 else:
                     typeid = t.replace('typeid-', '')
             if page > 1:
-                url = "https://www.2animx.com/index.php?s=%2Findex-html-status-{}-typeid-{}-sort-&page={}"\
-                    .format(status, typeid, page)
+                url = urljoin(
+                    self.SITE_INDEX,
+                    "/index.php?s=%2Findex-html-status-{}-typeid-{}-sort-&page={}".format(status, typeid, page)
+                )
             else:
-                url = "https://www.2animx.com/index-html-status-{}-typeid-{}-sort-"\
-                    .format(status, typeid)
+                url = urljoin(
+                    self.SITE_INDEX,
+                    "/index-html-status-{}-typeid-{}-sort-".format(status, typeid)
+                )
         soup = self.get_soup(url)
         return self.parse_book_list(soup)
 
     def search(self, name, page=1, size=None):
         if page > 1:
-            url = 'https://www.2animx.com/index.php?s=%2Fsearch-index&searchType=1&q={}&page={}'\
-                .format(name, page)
+            url = urljoin(
+                self.SITE_INDEX,
+                '/index.php?s=%2Fsearch-index&searchType=1&q={}&page={}'.format(name, page)
+            )
         else:
-            url = "https://www.2animx.com/search-index?searchType=1&q={}".format(name)
+            url = urljoin(
+                self.SITE_INDEX,
+                "/search-index?searchType=1&q={}".format(name)
+            )
         soup = self.get_soup(url)
         return self.parse_book_list(soup)

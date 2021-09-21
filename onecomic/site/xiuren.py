@@ -34,7 +34,7 @@ class NvshensCrawler(CrawlerBase):
         image_urls = []
         for a in soup.find('div', {'class': 'post'}).find_all('a'):
             url = a.get('href')
-            if url == 'http://www.xiuren.org/tuigirl-special-lilisha-double-download.html':
+            if url == urljoin(self.SITE_INDEX, '/tuigirl-special-lilisha-double-download.html'):
                 continue
             image_urls.append(url)
 

@@ -107,6 +107,8 @@ def get_parser():
     parser.add_argument('--image-timeout', type=int, help="图片下载超时时间")
     parser.add_argument('--crawler-timeout', type=int, help="站点访问超时时间")
     parser.add_argument('--crawler-delay', type=int, help="每个章节下载时间间隔")
+    parser.add_argument('--site-index', type=str, help="站点主页")
+    parser.add_argument('--user-agent', type=str, help="User-Agent")
 
     parser.add_argument('-V', '--version', action='version', version=VERSION)
     parser.add_argument('--debug', action='store_true', help="debug")
@@ -292,6 +294,10 @@ def init_crawler(site, config):
         logger.info('set proxy. %s', proxy)
         CrawlerSession.set_proxy(site=site, proxy=proxy)
         ImageSession.set_proxy(site=site, proxy=proxy)
+    if config.user_agent:
+        CrawlerSession.DEFAULT_HEADERS['User-Agent'] = config.user_agent
+        ImageSession.DEFAULT_HEADERS['User-Agent'] = config.user_agent
+        logger.info('set User-Agent: %s', config.user_agent)
 
     # 加载cookies
     cookies_path = config.get_cookies_path(site)
@@ -301,6 +307,12 @@ def init_crawler(site, config):
 
     ImageSession.set_timeout(site=site, timeout=config.image_timeout)
     CrawlerSession.set_timeout(site=site, timeout=config.crawler_timeout)
+    site_index = config.get_site_index(site=site)
+    if site_index:
+        crawler_cls = ComicBook.CRAWLER_CLS_MAP.get(site)
+        if crawler_cls:
+            crawler_cls.SITE_INDEX = site_index
+            logger.info('set site_index. site=%s new_site_index=%s', site, site_index)
 
 
 def save_cookies(site, config):
@@ -371,7 +383,7 @@ def main():
         receivers=args.receivers,
         merge=args.merge,
         merge_zip=args.merge_zip,
-        crawler_delay=config.crawler_delay
+        crawler_delay=config.crawler_delay,
     )
 
     if site:

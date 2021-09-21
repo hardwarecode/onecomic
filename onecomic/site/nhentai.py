@@ -105,9 +105,9 @@ class NhentaiCrawler(CrawlerBase):
             return self.latest(page=page)
         elif '_' in tag:
             name, tag = tag.split('_', 1)
-            url = 'https://nhentai.net/%s/%s/popular' % (name, tag)
+            url = urljoin(self.SITE_INDEX, '/%s/%s/popular' % (name, tag))
         else:
-            url = 'https://nhentai.net/tag/%s/popular' % tag
+            url = urljoin(self.SITE_INDEX, '/tag/%s/popular' % tag)
 
         params = {'page': page}
         soup = self.get_soup(url, params=params)

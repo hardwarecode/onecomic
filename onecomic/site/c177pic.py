@@ -127,7 +127,7 @@ class C177picCrawler(CrawlerBase):
 
     def search(self, name, page, size=None):
         if page > 1:
-            url = 'http://www.177pic.info/page/%s/?s=%s&cat=0' % (page, name)
+            url = urljoin(self.SITE_INDEX, '/page/%s/?s=%s&cat=0' % (page, name))
         else:
-            url = 'http://www.177pic.info/?s=%s&cat=0' % name
+            url = urljoin(self.SITE_INDEX, '/?s=%s&cat=0' % name)
         return self.paesr_book_list(url)

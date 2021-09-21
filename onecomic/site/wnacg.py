@@ -86,7 +86,7 @@ class WnacgCrawler(CrawlerBase):
         return result
 
     def latest(self, page=1):
-        url = 'http://www.wnacg.org/albums-index-page-%s.html' % page
+        url = urljoin(self.SITE_INDEX, '/albums-index-page-%s.html' % page)
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('ul', {'class': 'cc'}).find_all('li'):
@@ -124,11 +124,11 @@ class WnacgCrawler(CrawlerBase):
     def get_tag_result(self, tag, page=1):
         if tag:
             try:
-                url = 'http://www.wnacg.org/albums-index-page-%s-cate-%s.html' % (page, int(tag))
+                url = urljoin(self.SITE_INDEX, '/albums-index-page-%s-cate-%s.html' % (page, int(tag)))
             except Exception:
-                url = 'http://www.wnacg.org/albums-index-page-%s-tag-%s.html' % (page, tag)
+                url = urljoin(self.SITE_INDEX, '/albums-index-page-%s-tag-%s.html' % (page, tag))
         else:
-            url = "http://www.wnacg.org/albums.html"
+            url = urljoin(self.SITE_INDEX, "/albums.html")
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('ul', {'class': 'cc'}).find_all('li'):

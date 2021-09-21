@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class Mh160Crawler(CrawlerBase):
 
     SITE = "mh160"
-    SITE_INDEX = 'https://www.mh160.xyz/'
+    SITE_INDEX = 'https://mh160.cc/'
     SOURCE_NAME = "漫画160"
     LOGIN_URL = SITE_INDEX
 
@@ -139,7 +139,7 @@ class Mh160Crawler(CrawlerBase):
         return result
 
     def search(self, name, page, size=None):
-        url = "https://www.mh160.xyz/statics/search.aspx?key=%s&page=%s" % (name, page)
+        url = urljoin(self.SITE_INDEX, "/statics/searchext.aspx?key=%s&page=%s" % (name, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('div', {'class': 'mh-search-result'}).ul.find_all('li'):

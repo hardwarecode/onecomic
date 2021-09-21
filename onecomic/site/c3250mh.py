@@ -86,7 +86,7 @@ class C3250mhCrawler(CrawlerBase):
         return result
 
     def get_tags(self):
-        url = 'https://www.3250mh.com/booklist.html'
+        url = urljoin(self.SITE_INDEX, '/booklist.html')
         soup = self.get_soup(url)
         tags = self.new_tags_item()
         for a in soup.find('dl', {'class': 'filter'}).find('dd', {'id': 'tags'}).find_all('a'):
@@ -128,12 +128,12 @@ class C3250mhCrawler(CrawlerBase):
                 params['area'] = t.replace('area_', '')
             elif t.startswith('end_'):
                 params['end'] = t.replace('end_', '')
-        url = "https://www.3250mh.com/booklist"
+        url = urljoin(self.SITE_INDEX, "/booklist")
         soup = self.get_soup(url, params=params)
         return self.parse_book_list(soup)
 
     def search(self, name, page=1, size=None):
         params = {'page': page, 'keyword': name}
-        url = "https://www.3250mh.com/search"
+        url = urljoin(self.SITE_INDEX, "/search")
         soup = self.get_soup(url, params=params)
         return self.parse_book_list(soup)

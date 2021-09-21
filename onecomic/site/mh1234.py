@@ -71,7 +71,7 @@ class Mh1234Crawler(CrawlerBase):
     def latest(self, page=1):
         if page > 1:
             self.new_search_result_item()
-        url = "https://www.mh1234.com/comic/one/page_recent.html"
+        url = urljoin(self.SITE_INDEX, "/comic/one/page_recent.html")
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('ul', {'id': 'w0'}).find_all('li'):
@@ -90,7 +90,7 @@ class Mh1234Crawler(CrawlerBase):
         return re.search(r'/comic/(\d+).html', url).group(1)
 
     def search(self, name, page, size=None):
-        url = 'https://www.mh1234.com/search/?keywords=%s&page=%s' % (name, page)
+        url = urljoin(self.SITE_INDEX, '/search/?keywords=%s&page=%s' % (name, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('div', {'id': 'dmList'}).find_all('li'):
@@ -117,7 +117,7 @@ class Mh1234Crawler(CrawlerBase):
         return tags
 
     def get_tag_result(self, tag, page=1):
-        url = "https://www.mh1234.com/comic/list/%s/%s.html" % (tag, page)
+        url = urljoin(self.SITE_INDEX, "/comic/list/%s/%s.html" % (tag, page))
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for li in soup.find('div', {'id': 'dmList'}).find_all('li'):

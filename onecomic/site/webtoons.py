@@ -89,7 +89,7 @@ class WebtoonsCrawler(CrawlerBase):
         if page >= 2:
             return self.new_search_result_item()
         result = self.new_search_result_item()
-        url = "https://www.webtoons.com/zh-hant/dailySchedule"
+        url = urljoin(self.SITE_INDEX, "/zh-hant/dailySchedule")
         soup = self.get_soup(url)
         for ul in soup.find_all('ul', {'class': 'daily_card'}):
             for li in ul.find_all('li'):

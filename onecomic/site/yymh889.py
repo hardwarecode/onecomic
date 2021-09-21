@@ -51,20 +51,26 @@ class Yymh889Crawler(CrawlerBase):
         total_page = 1
         size = 10
         page = 1
-        api_url = 'http://yymh889.com/home/api/chapter_list/tp/{comicid}-1-{page}-{size}'.format(
-            comicid=self.comicid,
-            page=page,
-            size=size
+        api_url = urljoin(
+            self.SITE_INDEX,
+            '/home/api/chapter_list/tp/{comicid}-1-{page}-{size}'.format(
+                comicid=self.comicid,
+                page=page,
+                size=size
+            )
         )
         api_data = self.get_json(api_url)
         total_page = api_data['result']['totalPage']
         chapter_number = 1
         data_list = api_data['result']['list']
         for page in range(2, total_page + 1):
-            api_url = 'http://yymh889.com/home/api/chapter_list/tp/{comicid}-1-{page}-{size}'.format(
-                comicid=self.comicid,
-                page=page,
-                size=size
+            api_url = urljoin(
+                self.SITE_INDEX,
+                '/home/api/chapter_list/tp/{comicid}-1-{page}-{size}'.format(
+                    comicid=self.comicid,
+                    page=page,
+                    size=size
+                )
             )
             api_data = self.get_json(api_url)
             data_list.extend(api_data['result']['list'])
@@ -127,7 +133,7 @@ class Yymh889Crawler(CrawlerBase):
         return result
 
     def search(self, name, page, size=None):
-        url = 'http://yymh889.com/home/api/searchk?keyword=%s&type=1&pageNo=%s' % (name, page)
+        url = urljoin(self.SITE_INDEX, '/home/api/searchk?keyword=%s&type=1&pageNo=%s' % (name, page))
         api_data = self.get_json(url)
         result = self.new_search_result_item()
         for item in api_data['result'].get('list', []):
