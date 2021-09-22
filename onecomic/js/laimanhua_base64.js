@@ -1,3 +1,4 @@
+// https://www.laimanhua.net/template/skin4_20110501/js/laimanhuastyle/base64.js
 //获取当前图片
 function getUrlpics(){
        var PicUrls=picTree;
@@ -52,20 +53,7 @@ function getrealurl(urlstr){
            realurl=realurl.replace("p10.tuku.cc:8899","tkpic.tukucc.com");                      
        }
       else if(realurl.indexOf("http://")==-1){
-         
-         
-           realurl=encodeURI(getpicdamin() + realurl); 
-   
-          //realurl=getpicdamin()+"/url.asp?url=" + realurl;
-
-          
-          //if (realurl.indexOf("mhpic5")!=-1)
-          //realurl= realurl + (window.isWebp ? "@!webp" : "");
-          
-
-          //console.log(realurl);
-          //alert(realurl);   
-                  
+           realurl=encodeURI(getpicdamin() + realurl);
        }
 
 
@@ -276,40 +264,11 @@ function prom(vstr)
 }
 
 
-function getpicdamin()  
-{ 
-    //if (parseInt(cid)>10000){
-      
-         //yuming="https://mhpic6.hsvac.cn";
-        //yuming="https://manhuapicdisk03.cdn.bcebos.com";
-     
-   // }else{
-     
-        //yuming="https://mhpic7.kingwar.cn"; 
-         // yuming="https://manhuapicdisk03.cdn.bcebos.com"; 
-    //}
-     
-    //yuming="https://mhpic6.hsvac.cn";
-     // yuming="https://mhpic6.szsjcd.cn";
-      //yuming="https://mhpic6.miyeye.cn:20207";
-       
-       yuming="https://res.gezhengzhongyi.cn:8443";
-
-    if (parseInt(currentChapterid)>542724){
-         
-         //yuming="https://mhpic5.miyeye.cn:8443";
-         yuming="https://mhpic5.gezhengzhongyi.cn:8443";
-         //yuming="https://mhpic5.hsvac.cn";
-        //yuming="https://manhuapicdisk02.cdn.bcebos.com";
-     
-    }
-    if (parseInt(currentChapterid)>885032)      
-       yuming="https://mhpic88.miyeye.cn:8443";
-   
-
-
-
-    return yuming; 
+function getpicdamin() {
+    yuming = "https://mhpic6.kingwar.cn";
+    if (parseInt(currentChapterid) > 542724)
+        yuming = "https://mhpic5.kingwar.cn";
+    return yuming;
 }
 
 
