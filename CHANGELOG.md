@@ -1,4 +1,7 @@
 **unreleased**
+**v0.2.13**
+- fix laimanhua图片域名获取
+
 **v0.2.12**
 - 添加漫画源：BoyLove https://boylove.cc/
 - 添加漫画源：酷爱漫画 https://www.kuimh.com/
