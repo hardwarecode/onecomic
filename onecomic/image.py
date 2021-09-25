@@ -88,16 +88,21 @@ class ImageDownloader(object):
         if callable(image_pipeline):
             image_pipeline(target_path)
 
-        if transfer_webp:
+        if transfer_webp and self.is_webp_image(target_path):
             PIL.Image.open(target_path).save(target_path, mode='JPEG')
         return target_path
 
+    def is_webp_image(self, image_path):
+        webp_head = bytes.fromhex("524946462A73010057454250")
+        head = open(image_path, 'rb').read(12)
+        if head[:4] == webp_head[:4] and head[-4:] == webp_head[-4:]:
+            return True
+        return False
+
     def verify_image(self, image_path):
         suffix = image_path.split('.')[-1]
-        webp_head = bytes.fromhex("524946462A73010057454250")
         if suffix.lower() == 'webp':
-            head = open(image_path, 'rb').read(12)
-            if head[:4] == webp_head[:4] and head[-4:] == webp_head[-4:]:
+            if self.is_webp_image(image_path):
                 return True
         with PIL.Image.open(image_path) as img:
             img.verify()
