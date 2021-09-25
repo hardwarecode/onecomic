@@ -16,6 +16,8 @@ def migrate_image_name_format(comicbook_dir):
         if crawler_cls.SINGLE_CHAPTER:
             # 站点目录
             dir1 = os.path.join(comicbook_dir, crawler_cls.SOURCE_NAME)
+            if not os.path.isdir(dir1):
+                continue
             for name1 in os.listdir(dir1):
                 # 漫画目录
                 dir2 = os.path.join(dir1, name1)
@@ -26,7 +28,6 @@ def migrate_image_name_format(comicbook_dir):
                     dir3 = os.path.join(dir2, name2)
                     if not os.path.isdir(dir3):
                         continue
-
                     for image_name in os.listdir(dir3):
                         r = re.search(r'(\d+)\.(jpg|webp|gif|png|jpeg)', image_name)
                         if not r:
