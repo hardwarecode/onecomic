@@ -61,7 +61,7 @@ class ImageDownloader(object):
         return False
 
     @image_download_retry(times=3, delay=1)
-    def download_image(self, image_url, target_path, image_pipeline=None, headers=None, **kwargs):
+    def download_image(self, image_url, target_path, image_pipeline=None, headers=None, transfer_webp=None, **kwargs):
         if self.is_image_exists(target_path):
             return target_path
         session = self.get_session()
@@ -85,8 +85,11 @@ class ImageDownloader(object):
             os.unlink(target_path)
             raise ImageDownloadError(f'Corrupt image from {image_url}') from e
 
-        if image_pipeline:
+        if callable(image_pipeline):
             image_pipeline(target_path)
+
+        if transfer_webp:
+            PIL.Image.open(target_path).save(target_path, mode='JPEG')
         return target_path
 
     def verify_image(self, image_path):
@@ -99,14 +102,15 @@ class ImageDownloader(object):
         with PIL.Image.open(image_path) as img:
             img.verify()
 
-    def download_images(self, image_urls, output_dir, image_pipelines=None, headers_list=None, **kwargs):
+    def download_images(self, image_urls, output_dir, image_pipelines=None,
+                        headers_list=None, transfer_webp=None, **kwargs):
         """下载出错只打印出警告信息，不抛出异常
         """
         pool = WorkerPoolMgr.get_pool()
         future_list = []
         for idx, image_url in enumerate(image_urls, start=1):
-            ext = self.find_suffix(image_url)
-            target_path = os.path.join(output_dir.rstrip(), "{}.{}".format(idx, ext))
+            ext = 'jpg' if transfer_webp else self.find_suffix(image_url)
+            target_path = os.path.join(output_dir.rstrip(), "{:>03}.{}".format(idx, ext))
             image_pipeline = image_pipelines[idx - 1] if image_pipelines else None
             headers = headers_list[idx - 1] if headers_list else None
             future = pool.submit(
@@ -115,6 +119,7 @@ class ImageDownloader(object):
                 target_path=target_path,
                 image_pipeline=image_pipeline,
                 headers=headers,
+                transfer_webp=transfer_webp,
                 **kwargs)
             future_list.append(future)
 

@@ -152,7 +152,7 @@ class Yymh889ImageDownloader(ImageDownloader):
     SITE = Yymh889Crawler.SITE
 
     @image_download_retry(times=3, delay=1)
-    def download_image(self, image_url, target_path, image_pipeline=None, headers=None, **kwargs):
+    def download_image(self, image_url, target_path, image_pipeline=None, headers=None, transfer_webp=None, **kwargs):
         if self.is_image_exists(target_path):
             return target_path
         session = self.get_session()

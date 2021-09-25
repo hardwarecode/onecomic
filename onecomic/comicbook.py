@@ -276,7 +276,7 @@ class Chapter(object):
                                     )
         return zipfile_path
 
-    def save(self, output_dir):
+    def save(self, output_dir, transfer_webp=None):
         chapter_dir = self.get_chapter_image_dir(output_dir)
         if self._saved is True:
             return chapter_dir
@@ -289,7 +289,9 @@ class Chapter(object):
             image_urls=self.image_urls,
             output_dir=chapter_dir,
             headers_list=headers_list,
-            image_pipelines=self.chapter_item.image_pipelines)
+            image_pipelines=self.chapter_item.image_pipelines,
+            transfer_webp=transfer_webp)
+
         self._saved = True
         return chapter_dir
 

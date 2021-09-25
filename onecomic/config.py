@@ -23,6 +23,7 @@ class CrawlerConfig(object):
     CRAWLER_DELAY = 'crawler_delay'
     SITE_INDEX = 'site_index'
     USER_AGENT = 'user_agent'
+    TRANSFER_WEBP = 'transfer_webp'
 
     DEFAULT_VALUE = {
         DOWNLOAD_DIR: 'download',
@@ -37,6 +38,7 @@ class CrawlerConfig(object):
         CRAWLER_DELAY: 0,
         SITE_INDEX: '',
         USER_AGENT: '',
+        TRANSFER_WEBP: None,
     }
 
     TO_ENV_KEY = {
@@ -57,13 +59,15 @@ class CrawlerConfig(object):
     def __init__(self, args=None):
         self.args = args
         self.config = deepcopy(self.DEFAULT_VALUE)
-        self.config.update(self.read_config(self.get_config_file()))
 
         # 先从环境便令获取
         for key in self.TO_ENV_KEY:
             value = os.environ.get(self.TO_ENV_KEY[key])
             if value:
                 self.config[key] = value
+
+        # 其次从配置文件获取
+        self.config.update(self.read_config(self.get_config_file()))
 
         # 从命令行获取参数 优先级高
         if args:
@@ -169,3 +173,7 @@ class CrawlerConfig(object):
     @property
     def user_agent(self):
         return self.config[self.USER_AGENT]
+
+    @property
+    def transfer_webp(self):
+        return self.config[self.TRANSFER_WEBP]

@@ -109,6 +109,8 @@ def get_parser():
     parser.add_argument('--crawler-delay', type=int, help="每个章节下载时间间隔")
     parser.add_argument('--site-index', type=str, help="站点主页")
     parser.add_argument('--user-agent', type=str, help="User-Agent")
+    parser.add_argument('--transfer-webp', action='store_true', help="transfer-webp")
+    parser.add_argument('--migrate-image-name-format', action='store_true', help="migrate-image-name-format")
 
     parser.add_argument('-V', '--version', action='version', version=VERSION)
     parser.add_argument('--debug', action='store_true', help="debug")
@@ -134,7 +136,7 @@ def download_main(comicbook, output_dir, ext_name=None, chapters=None,
                   is_download_all=None, is_gen_pdf=None, is_gen_zip=None,
                   is_single_image=None, quality=None, max_height=None, mail=None,
                   receivers=None, is_send_mail=None, merge=None, merge_zip=None,
-                  crawler_delay=None):
+                  crawler_delay=None, transfer_webp=None):
     is_gen_pdf = is_gen_pdf or is_send_mail
     chapter_str = chapters or '-1'
     chapter_numbers = parser_chapter_str(chapter_str=chapter_str,
@@ -148,7 +150,7 @@ def download_main(comicbook, output_dir, ext_name=None, chapters=None,
                 name=comicbook.name, chapter_number=chapter.chapter_number, title=chapter.title)
             )
 
-            chapter_dir = chapter.save(output_dir=output_dir)
+            chapter_dir = chapter.save(output_dir=output_dir, transfer_webp=transfer_webp)
             chapter_dirs.append(chapter_dir)
             logger.info("下载成功 %s", chapter_dir)
             if is_single_image:
@@ -341,6 +343,20 @@ def main():
     init_logger(debug=args.debug)
 
     config = CrawlerConfig(args=args)
+    if args.migrate_image_name_format:
+        from .migrate import migrate_image_name_format
+        raw = input("""
+确认将文件夹(%s)内的图片名从 1.jpg 2.jpg ...
+重命名为 001.jpg 002.jpg ...？
+确认请输入yes:""" % config.output)
+        if raw.lower() != 'yes':
+            logger.info('')
+            exit(1)
+        logger.info('migrate_image_name_format start')
+        migrate_image_name_format(config.output)
+        logger.info('migrate_image_name_format success')
+        exit(0)
+
     WorkerPoolMgr.set_worker(worker=config.worker)
     CrawlerBase.DRIVER_PATH = config.driver_path
     logger.debug('set DRIVER_PATH. DRIVER_PATH=%s', config.driver_path)
@@ -384,6 +400,7 @@ def main():
         merge=args.merge,
         merge_zip=args.merge_zip,
         crawler_delay=config.crawler_delay,
+        transfer_webp=config.transfer_webp
     )
 
     if site:
