@@ -5,8 +5,8 @@ import re
 import logging
 import datetime
 import math
+import time
 from urllib.parse import urljoin
-
 
 from ..crawlerbase import CrawlerBase
 from ..exceptions import ChapterNotFound, ComicbookNotFound
@@ -21,9 +21,11 @@ class BilibiliCrawler(CrawlerBase):
 
     SOURCE_NAME = "哔哩哔哩漫画"
     DATA_HOST = "https://i0.hdslb.com/"
-    COMICBOOK_API = "https://manga.bilibili.com/twirp/comic.v1.Comic/ComicDetail?device=h5&platform=h5"
-    CHAPTER_API = "https://manga.bilibili.com/twirp/comic.v1.Comic/Index?device=h5&platform=h5"
-    IMAGE_TOKEN_API = "https://manga.bilibili.com/twirp/comic.v1.Comic/ImageToken?device=h5&platform=h5"
+    COMICBOOK_API = "https://manga.bilibili.com/twirp/comic.v1.Comic/ComicDetail?device=pc&platform=web"
+    CHAPTER_API = "https://manga.bilibili.com/twirp/comic.v1.Comic/Index?device=pc&platform=web"
+    CHAPTER_API_V2 = "https://manga.bilibili.com/twirp/comic.v1.Comic/GetImageIndex?device=pc&platform=web"
+    IMAGE_TOKEN_API = "https://manga.bilibili.com/twirp/comic.v1.Comic/ImageToken?device=pc&platform=web"
+
     SEARCH_API = "https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web"
     LOGIN_URL = SITE_INDEX
     COMICID_PATTERN = re.compile(r'/detail/mc(\d+)/?')
@@ -70,6 +72,25 @@ class BilibiliCrawler(CrawlerBase):
         return bytes(indexData)
 
     def get_chapter_api_data(self, cid):
+        url = self.CHAPTER_API_V2
+        response = self.send_request("POST", url, data={"ep_id": cid})
+        data = response.json()['data']
+        url = data['host'] + data['path']
+        response = self.send_request('GET', url)
+        indexData = response.content
+        hashKey = self.generateHashKey(seasonId=self.comicid, episodeId=cid)
+        indexData = list(indexData)[9:]
+        if not indexData:
+            source_url = self.get_chapter_soure_url(cid=cid)
+            raise ChapterNotFound(f"Please read on bilibili Manga APP. {source_url}")
+        indexData = self.unhashContent(hashKey=hashKey, indexData=indexData)
+
+        file = io.BytesIO(indexData)
+        obj = zipfile.ZipFile(file)
+        data = json.loads(obj.read("index.dat"))
+        return data
+
+    def _get_chapter_api_data(self, cid):
         url = self.CHAPTER_API
         response = self.send_request("POST", url, data={"ep_id": cid})
 
@@ -131,7 +152,9 @@ class BilibiliCrawler(CrawlerBase):
     def get_chapter_image_urls(self, citem):
         chapter_api_data = self.get_chapter_api_data(cid=citem.cid)
         token_url = self.IMAGE_TOKEN_API
-        response = self.send_request("POST", token_url, data={"urls": json.dumps(chapter_api_data["pics"])})
+        ts = "%x" % int(time.time())
+        params = {"urls": json.dumps(chapter_api_data["pics"]), 'ts': ts}
+        response = self.send_request("POST", token_url, data=params)
         data = response.json()
         image_urls = ["{}?token={}".format(i["url"], i["token"]) for i in data["data"]]
         return image_urls
