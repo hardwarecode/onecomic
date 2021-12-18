@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class NsfwpicxCrawler(CrawlerBase):
 
     SITE = "nsfwpicx"
-    SITE_INDEX = 'http://kkoo.icu/'
+    SITE_INDEX = 'http://picxx.icu/'
     SOURCE_NAME = "Nsfwpicx"
     LOGIN_URL = SITE_INDEX
     R18 = True
@@ -18,7 +18,7 @@ class NsfwpicxCrawler(CrawlerBase):
     DEFAULT_COMICID = '1802'
     DEFAULT_SEARCH_NAME = ''
     DEFAULT_TAG = ""
-    COMICID_PATTERN = re.compile(r'kkoo\.icu/(\d+)\.html')
+    COMICID_PATTERN = re.compile(r'https?://.*?\/(.*?)\.html')
     SINGLE_CHAPTER = True
     SITE_ENABLE = True
 
@@ -42,8 +42,17 @@ class NsfwpicxCrawler(CrawlerBase):
         name = self.comicid
         author = ''
         desc = ''
-        image_urls = [img.get('data-src') or img.get('src') for img in
-                      soup.find('div', {'class': 'entry-content'}).find_all('img')]
+        image_urls = []
+        try:
+            image_urls = [img.get('data-src') or img.get('src') for img in
+                          soup.find('div', {'class': 'entry-content'}).find_all('img')]
+        except Exception:
+            pass
+        if not image_urls:
+            try:
+                image_urls = [i.img.get('data-src') or i.img.get('src') for i in soup.find_all("figure")]
+            except Exception:
+                pass
         book = self.new_comicbook_item(name=name,
                                        desc=desc,
                                        cover_image_url=image_urls[0],
@@ -63,12 +72,12 @@ class NsfwpicxCrawler(CrawlerBase):
             url = self.SITE_INDEX
         soup = self.get_soup(url)
         result = self.new_search_result_item()
-        for a in soup.find_all('a', {'class': 'entry-image'}):
-            href = a.get('href')
+        for li in soup.find_all('article'):
+            href = li.a.get('href')
             source_url = urljoin(self.SITE_INDEX, href)
             comicid = self.get_comicid_by_url(source_url)
             name = comicid
-            cover_image_url = a.img.get('src')
+            cover_image_url = li.a.img.get('data-src') or li.a.img.get('src')
             result.add_result(comicid=comicid,
                               name=name,
                               cover_image_url=cover_image_url,
@@ -93,12 +102,12 @@ class NsfwpicxCrawler(CrawlerBase):
             url = urljoin(self.SITE_INDEX, "/category/%s" % tag)
         soup = self.get_soup(url)
         result = self.new_search_result_item()
-        for a in soup.find_all('a', {'class': 'entry-image'}):
-            href = a.get('href')
+        for li in soup.find_all('article'):
+            href = li.a.get('href')
             source_url = urljoin(self.SITE_INDEX, href)
             comicid = self.get_comicid_by_url(source_url)
             name = comicid
-            cover_image_url = a.img.get('src')
+            cover_image_url = li.a.img.get('data-src') or li.a.img.get('src')
             result.add_result(comicid=comicid,
                               name=name,
                               cover_image_url=cover_image_url,

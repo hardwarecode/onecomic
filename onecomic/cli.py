@@ -85,17 +85,14 @@ def get_parser():
 
     parser.add_argument('--cookies-path', type=str, help="读取或保存上次使用的cookies路径")
 
-    parser.add_argument('--latest-all', action='store_true', help="下载最近更新里的所有漫画")
-    parser.add_argument('--latest-page', type=str, help="最近更新的页数，如1-10，默认第1页")
+    parser.add_argument('--page', type=str, help="页数，如1-10，默认第1页")
+
+    parser.add_argument('--latest', action='store_true', help="下载最近更新里的所有漫画")
 
     parser.add_argument('--show-tags', action='store_true', help="展示当前支持的标签")
-    parser.add_argument('--tag-all', action='store_true', help="下载标签里的所有漫画")
     parser.add_argument('--tag', type=str, help="标签id或标签名")
-    parser.add_argument('--tag-page', type=str, help="标签页数，如1-10，默认第1页")
 
-    parser.add_argument('--search-all', action='store_true', help="下载搜索结果的所有漫画")
-    parser.add_argument('--search-page', type=str, help="搜索结果页数，如1-10，默认第1页")
-    parser.add_argument('--search-name', type=str, help="搜索的名字")
+    parser.add_argument('--search', action='store_true', help="下载搜索结果的所有漫画")
 
     parser.add_argument('--proxy', type=str,
                         help='设置代理，如 --proxy "socks5://user:pass@host:port"')
@@ -413,12 +410,12 @@ def main():
         echo_search_result(site=site, name=args.name)
     elif args.url_file:
         download_url_list(config=config, url_file=args.url_file, **download_main_kwargs)
-    elif site and args.latest_all:
-        download_latest_all(site=site, page_str=args.latest_page, **download_main_kwargs)
-    elif site and args.tag_all:
-        download_tag_all(site=site, tag=args.tag, page_str=args.tag_page, **download_main_kwargs)
-    elif site and args.search_all:
-        download_search_all(site=site, name=args.search_name, page_str=args.search_page, **download_main_kwargs)
+    elif site and args.latest:
+        download_latest_all(site=site, page_str=args.page, **download_main_kwargs)
+    elif site and args.tag:
+        download_tag_all(site=site, tag=args.tag, page_str=args.page, **download_main_kwargs)
+    elif site and args.search:
+        download_search_all(site=site, name=args.search, page_str=args.page, **download_main_kwargs)
     elif site:
         comicbook = ComicBook(site=site, comicid=comicid)
         comicbook.start_crawler()
