@@ -227,3 +227,7 @@ def test_boylove():
 
 def test_kuimh():
     _test_crawl_comicbook(site='kuimh')
+
+
+def test_manhuafei():
+    _test_crawl_comicbook(site='manhuafei')

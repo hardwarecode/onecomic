@@ -18,7 +18,7 @@ class SessionMgr(object):
     COOKIES_KEYS = ['name', 'value', 'path', 'domain']
     TIMEOUT_CONFIG = {}
     PROXY_CLS_CONFIG = {}
-    HTTP_20_SITE = ['webtoons', 'toomics']
+    HTTP_20_SITE = []
 
     @classmethod
     def get_timeout(cls, site, default=30):
@@ -110,8 +110,8 @@ class SessionMgr(object):
 
 
 class CrawlerSession(SessionMgr):
-    pass
+    HTTP_20_SITE = ['webtoons', 'toomics']
 
 
 class ImageSession(SessionMgr):
-    pass
+    HTTP_20_SITE = ['webtoons', 'toomics', 'manhuafei']
