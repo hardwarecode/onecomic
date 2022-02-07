@@ -25,6 +25,7 @@ class CocomanhuaCrawler(CrawlerBase):
     REQUIRE_JAVASCRIPT = True
     COCOMANHUA_JS_PATH = os.path.abspath(os.path.join(HERE, '../js/cocomanhua.js'))
     NEEDED_NODE_PACKAGES = ['crypto-js']
+    SITE_ENABLE = False
 
     @property
     def source_url(self):

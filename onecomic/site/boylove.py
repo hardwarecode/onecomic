@@ -53,7 +53,7 @@ class BoyloveCrawler(CrawlerBase):
                                        author=author,
                                        source_url=self.source_url,
                                        last_update_time=last_update_time)
-        s = re.findall(r'let data = JSON.parse\((.*?)\)', html_code)[-1]
+        s = re.findall(r'let data = JSON.parse\((.*?)\);', html_code)[-1]
         data = json.loads(json.loads(s))
         for chapter_number, item in enumerate(data['list'], start=1):
             source_url = urljoin(self.SITE_INDEX, '/home/book/capterid/%s' % item['id'])
