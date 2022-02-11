@@ -1,4 +1,5 @@
 **unreleased**
+**v0.2.21**
 **v0.2.20**
 - 添加漫画源：漫画飞 https://www.manhuafei.com/
 - 修复boylove部分漫画可能下载失败的问题
