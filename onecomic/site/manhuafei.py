@@ -42,9 +42,9 @@ class ManhuafeiCrawler(CrawlerBase):
                     status = text.replace('状态：', '').strip()
                 elif '类型：' in text:
                     for a in i.span.find_all('a'):
-                        name = a.text.strip()
+                        tag_name = a.text.strip()
                         tag = a.get('href').split('')[-1].replace('.html', '')
-                        tags.append((name, tag))
+                        tags.append((tag_name, tag))
                 elif '作者：' in text:
                     author = text
             except Exception:
@@ -58,8 +58,8 @@ class ManhuafeiCrawler(CrawlerBase):
                                        cover_image_url=cover_image_url,
                                        author=author,
                                        source_url=self.source_url)
-        for name, tag in tags:
-            book.add_tag(name=name, tag=tag)
+        for tag_name, tag in tags:
+            book.add_tag(name=tag_name, tag=tag)
         items = soup.find('div', {'class': 'all-box'}).find_all('a', {'class': 'links-of-books fixed-a-es'})
         for chapter_number, item in enumerate(reversed(items), start=1):
             url = item.get('href')
