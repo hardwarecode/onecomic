@@ -76,7 +76,10 @@ class CrawlerConfig(object):
                 if key == 'output':
                     key = self.DOWNLOAD_DIR
 
-                if value is not None:
+                if isinstance(value, bool):
+                    if value:
+                        self.config[key] = value
+                elif value is not None:
                     self.config[key] = value
         logger.debug('CrawlerConfig config=%s', self.config)
 
