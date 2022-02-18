@@ -62,7 +62,7 @@ class BaozimhCrawler(CrawlerBase):
     def get_chapter_image_urls(self, citem):
         soup = self.get_soup(citem.source_url)
         image_urls = [img.get('src')
-                      for img in soup.find('div', {'class': 'comic-contain'}).find_all('amp-img')]
+                      for img in soup.find('section', {'class': 'comic-contain'}).find_all('amp-img')]
         return image_urls
 
     def latest(self, page=1):
