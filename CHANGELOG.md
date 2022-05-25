@@ -1,4 +1,5 @@
 **unreleased**
+**v0.2.25**
 **v0.2.24**
 - 增加iqiyi漫画 https://bud.iqiyi.com/
 
