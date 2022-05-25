@@ -23,7 +23,8 @@ REQUIRED = [
     "lzstring",
     "hyper",
     "httpx",
-    "httpx-socks"
+    "httpx-socks",
+    "pysocks"
 ]
 
 # What packages are optional?
