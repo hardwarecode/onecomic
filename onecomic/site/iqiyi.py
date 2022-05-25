@@ -20,12 +20,20 @@ class IqiyiCrawler(CrawlerBase):
     DEFAULT_TAG = "0"
     COMICID_PATTERN = re.compile(r'/manhua/detail_(.*?)\.html')
 
+    @classmethod
+    def get_comicid_by_url(cls, comicid_or_url):
+        if comicid_or_url and isinstance(comicid_or_url, str):
+            r = cls.COMICID_PATTERN.search(comicid_or_url)
+            comicid = r.group(1) if r else comicid_or_url
+            return comicid.replace("detail_", "")
+        return comicid_or_url
+
     @property
     def source_url(self):
         return self.get_source_url(self.comicid)
 
     def get_source_url(self, comicid):
-        return urljoin(self.SITE_INDEX, "/manhua/{}.html".format(comicid))
+        return urljoin(self.SITE_INDEX, "/manhua/detail_{}.html".format(comicid))
 
     def get_comicbook_item(self):
         api_url = urljoin(self.SITE_INDEX, "/manhua/catalog/{}/".format(self.comicid))
