@@ -70,7 +70,7 @@ class KuimhCrawler(CrawlerBase):
         soup = self.get_soup(citem.source_url)
         image_urls = []
         for i in soup.find('div', {'class': 'comicpage'}).find_all('div', recursive=False):
-            image_url = i.img.get('data-echo') or i.get('src')
+            image_url = i.img.get('data-echo') or i.img.get('src')
             image_urls.append(image_url)
         return image_urls
 
