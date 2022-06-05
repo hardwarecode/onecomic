@@ -21,7 +21,7 @@ class TwhentaiCrawler(CrawlerBase):
     DEFAULT_COMICID = 'hentai_doujin-86561'
     DEFAULT_SEARCH_NAME = '姐姐'
     DEFAULT_TAG = ""
-    SITE_ENABLE = False
+    SITE_ENABLE = True
 
     @classmethod
     def get_comicid_by_url(cls, comicid_or_url):
@@ -89,7 +89,6 @@ class TwhentaiCrawler(CrawlerBase):
         for page in range(2, citem.total_page + 1):
             zip_args.append((_func, dict(page=page)))
         result = concurrent_run(zip_args=zip_args)
-        logger.info('result=', result)
         for urls in result:
             if urls:
                 image_urls.extend(urls)

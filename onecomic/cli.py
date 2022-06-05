@@ -206,7 +206,7 @@ def download_latest_all(site, page_str, **kwargs):
             result = comicbook.latest(page=page)
             logger.info('download_latest_all. page=%s result=%s', page, len(result))
         except Exception:
-            logger.info('download_latest_all error. page=%s', page)
+            logger.exception('download_latest_all error. page=%s', page)
             continue
         download_search_result(result, **kwargs)
 
@@ -219,7 +219,7 @@ def download_tag_all(site, tag, page_str, **kwargs):
             result = comicbook.get_tag_result(tag=tag, page=page)
             logger.info('download_tag_all. current page=%s result=%s', page, len(result))
         except Exception:
-            logger.info('download_tag_all error. page=%s', page)
+            logger.exception('download_tag_all error. page=%s', page)
             continue
         download_search_result(result, **kwargs)
 
@@ -232,7 +232,7 @@ def download_search_all(site, name, page_str, **kwargs):
             result = comicbook.search(name=name, page=page)
             logger.info('download_search_all. current page=%s result=%s', page, len(result))
         except Exception:
-            logger.info('search error. current page=%s', page)
+            logger.exception('search error. current page=%s', page)
             continue
         download_search_result(result, **kwargs)
 
@@ -247,7 +247,7 @@ def download_url_list(config, url_file, **kwargs):
             site = ComicBook.get_site_by_url(url=url)
             comicid = ComicBook.get_comicid_by_url(site=site, url=url)
             if not site or not comicid:
-                logger.info('Unknown url. url=%s', url)
+                logger.error('Unknown url. url=%s', url)
                 continue
             try:
                 comicbook = ComicBook(site=site, comicid=comicid)
