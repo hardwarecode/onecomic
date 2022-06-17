@@ -94,10 +94,11 @@ class ImageDownloader(object):
 
     def is_webp_image(self, image_path):
         webp_head = bytes.fromhex("524946462A73010057454250")
-        head = open(image_path, 'rb').read(12)
-        if head[:4] == webp_head[:4] and head[-4:] == webp_head[-4:]:
-            return True
-        return False
+        with open(image_path, 'rb') as f:
+            head = f.read(12)
+            if head[:4] == webp_head[:4] and head[-4:] == webp_head[-4:]:
+                return True
+            return False
 
     def verify_image(self, image_path):
         suffix = image_path.split('.')[-1]
@@ -129,11 +130,12 @@ class ImageDownloader(object):
             future_list.append(future)
 
         # 等全部图片下载完成
-        for future in future_list:
+        for idx, future in enumerate(future_list):
             try:
                 future.result()
             except Exception as e:
-                logger.warn('image download error. error=%s', e)
+                logger.warn('image download error. error=%s url=%s', e, image_urls[idx])
+                logger.debug('image download error. error=%s url=%s', e, image_urls[idx], exc_info=True)
         return output_dir
 
     @staticmethod
