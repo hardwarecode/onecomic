@@ -1,5 +1,6 @@
 import re
 import logging
+import random
 from urllib.parse import urljoin
 import json
 
@@ -59,7 +60,7 @@ class C36mhCrawler(CrawlerBase):
             book.add_tag(name=tag_name, tag=tag_id)
 
         li_list = soup.find('ul', {'id': 'chapter-list-4'}).find_all('li')
-        for chapter_number, li in enumerate(li_list, start=1):
+        for chapter_number, li in enumerate(reversed(li_list), start=1):
             href = li.a.get('href')
             url = urljoin(self.SITE_INDEX, href)
             title = li.a.text.strip()
@@ -74,9 +75,22 @@ class C36mhCrawler(CrawlerBase):
         chapterImages = re.search(r'var chapterImages = (\[.*?\]);', html).group(1)
         # prefix = 'https://res.xiaoqinre.com/'
         prefix = 'https://img001.sdldcy.com/'
+        try:
+            html = self.get_html(urljoin(self.SITE_INDEX, '/js/config.js'))
+            r = re.search(r'resHost: (\[.*\])', html).group(1)
+            config = json.loads(r)
+            prefix = random.choice(random.choice(config)['domain'])
+        except Exception:
+            pass
+
         image_urls = []
         for i in json.loads(chapterImages):
-            image_url = prefix + chapterPath + i
+            if i.startswith('http'):
+                image_url = i
+            elif chapterPath.startswith('http'):
+                image_url = chapterPath + i
+            else:
+                image_url = prefix + chapterPath + i
             image_urls.append(image_url)
         return image_urls
 
