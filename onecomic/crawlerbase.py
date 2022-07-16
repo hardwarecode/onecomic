@@ -254,7 +254,14 @@ class CrawlerBase(object):
         try:
             logger.debug('send_request. method=%s url=%s kwargs=%s headers=%s cookies=%s',
                          method, url, kwargs, session.headers, session.cookies)
-            return session.request(method=method, url=url, **kwargs)
+            response = session.request(method=method, url=url, **kwargs)
+            if response.status_code == 302:
+                redirect_url = response.headers.get('location')
+                logger.debug('302 redirect. url=%s redirect_url=%s', url, redirect_url)
+                return session.request(method=method, url=redirect_url, **kwargs)
+            else:
+                return response
+
         except Exception as e:
             msg = "NETWORK ERROR. can not open url: {}".format(url)
             raise URLException(msg) from e
