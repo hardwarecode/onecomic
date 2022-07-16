@@ -110,7 +110,7 @@ class C18comicCrawler(CrawlerBase):
         """
         if readmode == 'read-by-page':
             return
-        if '.jpg' not in image_url or int(aid) < int(scramble_id) or speed == '1':
+        if '.gif' in image_url or int(aid) < int(scramble_id) or speed == '1':
             return
         img = Image.open(image_path)
         new_img = Image.new(img.mode, img.size)
@@ -183,7 +183,8 @@ class C18comicCrawler(CrawlerBase):
         soup = self.get_soup(url)
         result = self.new_search_result_item()
         for div in soup.find_all('div', {'class': 'thumb-overlay-albums'}):
-            comicid = div.a.get('id').split('_')[-1]
+            href = div.a.get('href')
+            comicid = self.get_comicid_by_url(href)
             name = div.img.get('alt')
             cover_image_url = div.img.get('data-original')
             source_url = self.get_source_url(comicid)
