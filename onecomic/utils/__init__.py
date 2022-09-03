@@ -109,7 +109,7 @@ def image_dir_to_single_image(img_dir, output_dir, sort_by=None, quality=None, m
         height = item['height']
         new_img = Image.new('RGB', (width, height))
         current_h = 0
-        img_path = os.path.join(output_dir, '%s.jpg' % idx)
+        img_path = os.path.join(output_dir, f'{idx:>03}.jpg')
         for img in item['imgs']:
             new_img.paste(img, box=(0, current_h))
             current_h += img.size[1]
@@ -132,7 +132,7 @@ def merge_books(chapter_dirs, output_dir):
     for chapter_dir in chapter_dirs:
         for image in find_all_image(chapter_dir):
             ext = image.split('.')[-1]
-            target_path = os.path.join(output_dir, f'{idx}.{ext}')
+            target_path = os.path.join(output_dir, f'{idx:>03}.{ext}')
             shutil.copy(image, target_path)
             idx += 1
 
@@ -144,7 +144,7 @@ def merge_zip_books(chapter_dirs, target_path):
     for chapter_dir in chapter_dirs:
         for image in find_all_image(chapter_dir):
             ext = image.split('.')[-1]
-            filename = f'{idx}.{ext}'
+            filename = f'{idx:>03}.{ext}'
             f.write(image, arcname=os.path.join(arc_basename, filename))
             idx += 1
     f.close()
