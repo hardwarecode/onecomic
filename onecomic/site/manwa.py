@@ -91,7 +91,8 @@ class BaozimhCrawler(CrawlerBase):
         return citem
 
     def latest(self, page=1):
-        url = "https://manwa.site/getUpdate?page=%s&date=" % (page - 1) * 15
+        url = urljoin(self.SITE_INDEX, "/getUpdate") + "?page=%s&date=" % (page - 1) * 15
+
         data = self.get_json(url)
         result = self.new_search_result_item()
         for i in data['books']:
@@ -109,7 +110,7 @@ class BaozimhCrawler(CrawlerBase):
         if page > 1:
             return self.new_search_result_item()
         result = self.new_search_result_item()
-        url = "https://manwa.site/search?keyword=%s" % name
+        url = urljoin(self.SITE_INDEX, "/search") + "?keyword=%s" % name
         soup = self.get_soup(url)
         for li in soup.find('ul', {'class': 'book-list'}).find_all('li'):
             href = li.a.get('href')

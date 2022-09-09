@@ -69,10 +69,14 @@ def get_parser():
     parser.add_argument('-o', '--output', type=str,
                         help="文件保存路径，默认保存在当前路径下的download文件夹")
 
-    s = ' '.join(['%s(%s)' % (crawler.SITE, crawler.SOURCE_NAME) for crawler in ComicBook.CRAWLER_CLS_MAP.values()])
+    s = ' '.join([
+        '%s(%s)' % (crawler.SITE, crawler.SOURCE_NAME) for crawler in sorted(
+            ComicBook.CRAWLER_CLS_MAP.values(), key=lambda x: x.SITE
+        )
+    ])
     site_help_msg = "数据源网站：支持 %s" % s
 
-    parser.add_argument('-s', '--site', type=str, choices=ComicBook.CRAWLER_CLS_MAP.keys(),
+    parser.add_argument('-s', '--site', type=str, choices=sorted(ComicBook.CRAWLER_CLS_MAP.keys()),
                         help=site_help_msg)
 
     parser.add_argument('--driver-path', type=str, help="selenium driver")
