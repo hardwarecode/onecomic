@@ -79,14 +79,15 @@ class ImageDownloader(object):
         ensure_file_dir_exists(target_path)
         with open(target_path, 'wb') as f:
             f.write(response.content)
+
+        if callable(image_pipeline):
+            image_pipeline(target_path)
+
         try:
             self.verify_image(target_path)
         except UnidentifiedImageError as e:
             os.unlink(target_path)
             raise ImageDownloadError(f'Corrupt image from {image_url}') from e
-
-        if callable(image_pipeline):
-            image_pipeline(target_path)
 
         if transfer_webp and self.is_webp_image(target_path):
             PIL.Image.open(target_path).save(target_path, mode='JPEG')

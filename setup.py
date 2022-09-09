@@ -24,7 +24,8 @@ REQUIRED = [
     "hyper",
     "httpx",
     "httpx-socks",
-    "pysocks"
+    "pysocks",
+    "pycryptodomex"
 ]
 
 # What packages are optional?
