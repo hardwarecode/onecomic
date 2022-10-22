@@ -54,7 +54,7 @@ class KuaiKanCrawler(CrawlerBase):
                                        cover_image_url=cover_image_url,
                                        author=author,
                                        source_url=self.source_url)
-        for idx, c in enumerate(reversed(data['comics']), start=1):
+        for idx, c in enumerate(data['comics'], start=1):
             chapter_number = idx
             title = c['title']
             cid = c['id']
@@ -118,18 +118,13 @@ class KuaiKanCrawler(CrawlerBase):
         html = self.get_html(url)
         data = self.parse_api_data_from_page(html)
         tags = self.new_tags_item()
-        for i in data['res']['data']['tags']:
+        for i in data['tagList']:
             category = '题材'
             name = i['title']
-            tag_id = i['tag_id']
+            tag_id = i['tagId']
             tag = 'tag_id_%s' % tag_id
             tags.add_tag(category=category, name=name, tag=tag)
-        for i in data['res']['data']['update_status']:
-            category = '进度'
-            name = i['description']
-            code = i['code']
-            tag = 'state_%s' % code
-            tags.add_tag(category=category, name=name, tag=tag)
+
         return tags
 
     def get_tag_result(self, tag, page=1):
@@ -142,8 +137,10 @@ class KuaiKanCrawler(CrawlerBase):
         url = urljoin(self.SITE_INDEX, '/tag/%s' % tag_id)
         html = self.get_html(url, params=params)
         data = self.parse_api_data_from_page(html)
+        import json
+        logger.info('data: %s', json.dumps(data))
         result = self.new_search_result_item()
-        for i in data['res']['data']['topics']:
+        for i in data['dataList']:
             comicid = i['id']
             name = i['title']
             cover_image_url = i['cover_image_url']
