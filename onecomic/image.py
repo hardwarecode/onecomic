@@ -130,13 +130,25 @@ class ImageDownloader(object):
                 **kwargs)
             future_list.append(future)
 
-        # 等全部图片下载完成
-        for idx, future in enumerate(future_list):
-            try:
-                future.result()
-            except Exception as e:
-                logger.warn('image download error. error=%s url=%s', e, image_urls[idx])
-                logger.debug('image download error. error=%s url=%s', e, image_urls[idx], exc_info=True)
+        try:
+            while True:
+                # 等全部图片下载完成
+                if all([future.done() for future in future_list]):
+                    break
+                time.sleep(1)
+
+            for idx, future in enumerate(future_list):
+                try:
+                    future.result()
+                except Exception as e:
+                    logger.warn('image download error. error=%s url=%s', e, image_urls[idx])
+                    logger.debug('image download error. error=%s url=%s', e, image_urls[idx], exc_info=True)
+
+        except KeyboardInterrupt:
+            for future in future_list:
+                if not future.done():
+                    logger.debug('future cancel. future=%s', future)
+                    future.cancel()
         return output_dir
 
     @staticmethod

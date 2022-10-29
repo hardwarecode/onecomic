@@ -65,6 +65,7 @@ def get_parser():
                         help="打包生成zip文件")
 
     parser.add_argument('--config', help="配置文件路径")
+    parser.add_argument('--log-file', help="日志输出路径")
 
     parser.add_argument('-o', '--output', type=str,
                         help="文件保存路径，默认保存在当前路径下的download文件夹")
@@ -119,17 +120,31 @@ def get_parser():
     return parser
 
 
+DEFAULT_FORMATTER = logging.Formatter(
+    "%(asctime)s %(name)s %(lineno)s [%(levelname)s] %(message)s",
+    datefmt='%Y/%m/%d %H:%M:%S'
+)
+
+
 def init_logger(debug=False):
     level = logging.DEBUG if debug else logging.INFO
     logger = logging.getLogger()
     handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        "%(asctime)s %(name)s %(lineno)s [%(levelname)s] %(message)s",
-        datefmt='%Y/%m/%d %H:%M:%S'
-    )
-    handler.setFormatter(formatter)
+    handler.setFormatter(DEFAULT_FORMATTER)
     logger.addHandler(handler)
     logger.setLevel(level)
+    return logger
+
+
+def set_logger(config):
+    if config.log_file:
+        fileptah = config.log_file
+        handler = logging.FileHandler(fileptah, encoding='utf-8')
+        handler.setFormatter(DEFAULT_FORMATTER)
+
+        logger = logging.getLogger()
+        logger.addHandler(handler)
+        logger.info('set log filepath. filepath=%s', fileptah)
     return logger
 
 
@@ -342,8 +357,9 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     init_logger(debug=args.debug)
-
     config = CrawlerConfig(args=args)
+    set_logger(config)
+
     if args.migrate_image_name_format:
         from .migrate import migrate_image_name_format
         raw = input("""

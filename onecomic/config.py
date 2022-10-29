@@ -24,6 +24,7 @@ class CrawlerConfig(object):
     SITE_INDEX = 'site_index'
     USER_AGENT = 'user_agent'
     TRANSFER_WEBP = 'transfer_webp'
+    LOG_FILE = 'log_file'
 
     DEFAULT_VALUE = {
         DOWNLOAD_DIR: 'download',
@@ -39,6 +40,7 @@ class CrawlerConfig(object):
         SITE_INDEX: '',
         USER_AGENT: '',
         TRANSFER_WEBP: None,
+        LOG_FILE: None,
     }
 
     TO_ENV_KEY = {
@@ -180,3 +182,7 @@ class CrawlerConfig(object):
     @property
     def transfer_webp(self):
         return self.config[self.TRANSFER_WEBP]
+
+    @property
+    def log_file(self):
+        return self.config[self.LOG_FILE]
