@@ -1,6 +1,7 @@
 import re
 import logging
 from urllib.parse import urljoin
+import urllib.parse as urlparse
 
 from ..crawlerbase import CrawlerBase
 
@@ -62,6 +63,36 @@ class BaozimhCrawler(CrawlerBase):
     def get_chapter_image_urls(self, citem):
         soup = self.get_soup(citem.source_url)
         image_urls = [img.get('src') for img in soup.find_all('amp-img') if img.get('id', '').startswith('chapter-img')]
+
+        chapter_uri_pattern = citem.source_url.split('/')[-1].replace('.html', '')
+        if not re.match(r'\d+_\d+', chapter_uri_pattern):
+            parsed = urlparse.urlparse(citem.source_url)
+            params = urlparse.parse_qs(parsed.query)
+            section_slot = params.get('section_slot')[0] if params.get('section_slot') else 0
+            chapter_slot = params.get('chapter_slot')[0] if params.get('chapter_slot') else 0
+            chapter_uri_pattern = '%s_%s' % (section_slot, chapter_slot)
+
+        visited = set()
+        visited.add(soup.source_url)
+        while True:
+            try:
+                next_url = None
+                url = soup.find_all('div', {'class': 'next_chapter'})[-1].a.get('href').split('#')[0]
+                s = url.split('/')[-1]
+                if url not in visited and s.startswith(chapter_uri_pattern):
+                    next_url = url
+
+                if next_url:
+                    logger.info('next_url=%s, chapter_uri_pattern=%s', next_url, chapter_uri_pattern)
+                    # 0_18.html 0_18_1.html 0_18_2.html 0_19.html
+                    soup = self.get_soup(next_url)
+                    image_urls.extend([img.get('src') for img in soup.find_all('amp-img') if img.get('id', '').startswith('chapter-img')])
+                    visited.add(next_url)
+                else:
+                    break
+            except Exception:
+                logger.error('find next_chapter error. url=%s', citem.source_url)
+                break
 
         return image_urls
 
