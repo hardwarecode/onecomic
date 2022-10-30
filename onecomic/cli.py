@@ -344,9 +344,11 @@ def save_cookies(site, config):
 def echo_search_result(site, name):
     comicbook = ComicBook(site=site, comicid=None)
     result = comicbook.search(name=name)
-    msg_list = []
+    msg_list = [
+        "\t".join(['comicid', 'name', 'source_url'])
+    ]
     for item in result:
-        msg_list.append("comicid={}\t{}\tsource_url={}".format(
+        msg_list.append("{}\t{}\t{}".format(
             item.comicid, item.name, item.source_url)
         )
     logger.info('\n%s', '\n'.join(msg_list))

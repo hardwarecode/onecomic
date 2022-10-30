@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class C18hmmcgCrawler(CrawlerBase):
 
     SITE = "18hmmcg"
-    SITE_INDEX = 'http://18h.mm-cg.com/'
+    SITE_INDEX = 'https://18h.mm-cg.com/'
     SOURCE_NAME = "18h漫！"
     LOGIN_URL = SITE_INDEX
     R18 = True
@@ -45,25 +45,18 @@ class C18hmmcgCrawler(CrawlerBase):
         return citem
 
     def paesr_book_list(self, html):
-        r = re.search(
-            r"""<script>document.write\("<br>"\);document.getElementById\('main'\).innerHTML = '(.*?)';</script>""",
-            html, re.S)
-        if r:
-            soup = BeautifulSoup(r.group(1), 'html.parser')
-        else:
-            soup = BeautifulSoup(html, 'html.parser')
-
+        soup = BeautifulSoup(html, 'html.parser')
         result = self.new_search_result_item()
         added = set()
-        for a in soup.find_all('a', {'class': 'aRF'}):
-            href = a.get('href')
-            comicid = href.split('/')[-1].split('.')[0]
+        for div in soup.find_all("div", {"class": "post"}):
+            href = div.a.get('href')
+            comicid = self.get_comicid_by_url(href)
             if comicid in added:
                 continue
             added.add(comicid)
             source_url = urljoin(self.SITE_INDEX, href)
-            name = a.img.get('alt')
-            cover_image_url = a.img.get('src')
+            name = div.h3.text.strip()
+            cover_image_url = div.a.img.get('src')
             result.add_result(comicid=comicid,
                               name=name,
                               cover_image_url=cover_image_url,
@@ -76,34 +69,25 @@ class C18hmmcgCrawler(CrawlerBase):
         html = self.get_html(self.SITE_INDEX)
         return self.paesr_book_list(html)
 
+    TAGS = [
+        dict(name='18H漫畫', tag_id='18H_random'),
+        dict(name='18H短篇、同人', tag_id='doujin_random'),
+    ]
+
     def get_tags(self):
-        soup = self.get_soup(self.SITE_INDEX)
         tags = self.new_tags_item()
-        category = '分类'
-        for a in soup.find('span', {'class': 'altto'}).find_all('a'):
-            tag_id = a.get('href').split('/')[-1].split('.')[0]
-            tag_name = a.text
-            tags.add_tag(category=category, name=tag_name, tag=tag_id)
+        for i in self.TAGS:
+            tags.add_tag(category="分类", name=i['name'], tag=i['tag_id'])
         return tags
 
     def get_tag_result(self, tag, page=1):
         if page > 1:
             return self.new_search_result_item()
-
-        url = urljoin(self.SITE_INDEX, "18h_category/%s.html" % tag)
+        url = urljoin(self.SITE_INDEX, "/zh/%s/all/index.html" % tag)
         html = self.get_html(url)
         return self.paesr_book_list(html)
 
     def search(self, name, page, size=None):
-        if page > 1:
-            return self.new_search_result_item()
-        url = urljoin(self.SITE_INDEX, "/serch/18av_serch.html")
-        data = {
-            'form_serch_category': 'form_serch_18h',
-            'key_myform': name,
-            'form_page': page,
-            'se_id[]': '本站精选漫画分类'
-        }
-        response = self.send_request('POST', url, data=data)
-        html = response.text
+        url = urljoin(self.SITE_INDEX, "/zh/doujin_search/all/%s/%s.html" % (name, page))
+        html = self.get_html(url)
         return self.paesr_book_list(html)
