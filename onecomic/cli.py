@@ -137,12 +137,11 @@ def init_logger(debug=False):
 
 
 def set_logger(config):
+    logger = logging.getLogger()
     if config.log_file:
         fileptah = config.log_file
         handler = logging.FileHandler(fileptah, encoding='utf-8')
         handler.setFormatter(DEFAULT_FORMATTER)
-
-        logger = logging.getLogger()
         logger.addHandler(handler)
         logger.info('set log filepath. filepath=%s', fileptah)
     return logger
