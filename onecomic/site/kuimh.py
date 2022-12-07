@@ -69,9 +69,13 @@ class KuimhCrawler(CrawlerBase):
     def get_chapter_image_urls(self, citem):
         soup = self.get_soup(citem.source_url)
         image_urls = []
-        for i in soup.find('div', {'class': 'comicpage'}).find_all('div', recursive=False):
-            image_url = i.img.get('data-echo') or i.img.get('src')
-            image_urls.append(image_url)
+        for div in soup.find_all('div', {'class': 'comicpage'}):
+            if div.get('style') == "display:none":
+                continue
+            for i in div.find_all('img'):
+                image_url = i.get('data-echo') or i.get('src')
+                if image_url and not re.search(r'pic.kuimh.com/book/grey/\d+', image_url):
+                    image_urls.append(image_url)
         return image_urls
 
     def latest(self, page=1):
