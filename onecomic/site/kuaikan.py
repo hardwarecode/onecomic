@@ -62,7 +62,8 @@ class KuaiKanCrawler(CrawlerBase):
             book.add_chapter(chapter_number=chapter_number, source_url=url, title=title)
         for tag_name in data['topicInfo']['tags']:
             tag_id = self.get_tag_id_by_name(tag_name)
-            book.add_tag(name=tag_name, tag=tag_id)
+            if tag_id:
+                book.add_tag(name=tag_name, tag=tag_id)
         return book
 
     def get_chapter_soure_url(self, cid):
@@ -114,17 +115,19 @@ class KuaiKanCrawler(CrawlerBase):
         return result
 
     def get_tags(self):
-        url = urljoin(self.SITE_INDEX, "/tag/0?state=1&sort=1&page=1")
-        html = self.get_html(url)
-        data = self.parse_api_data_from_page(html)
         tags = self.new_tags_item()
-        for i in data['tagList']:
-            category = '题材'
-            name = i['title']
-            tag_id = i['tagId']
-            tag = 'tag_id_%s' % tag_id
-            tags.add_tag(category=category, name=name, tag=tag)
-
+        try:
+            url = urljoin(self.SITE_INDEX, "/tag/0?state=1&sort=1&page=1")
+            html = self.get_html(url)
+            data = self.parse_api_data_from_page(html)
+            for i in data['tagList']:
+                category = '题材'
+                name = i['title']
+                tag_id = i['tagId']
+                tag = 'tag_id_%s' % tag_id
+                tags.add_tag(category=category, name=name, tag=tag)
+        except Exception:
+            logger.exception('kuaikan get_tags error.')
         return tags
 
     def get_tag_result(self, tag, page=1):
