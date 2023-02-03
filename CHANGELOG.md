@@ -1,4 +1,7 @@
 **unreleased**
+**v0.2.39**
+fix boylove
+
 **v0.2.38**
 fix 酷爱漫画
 
