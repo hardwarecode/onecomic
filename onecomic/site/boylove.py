@@ -58,17 +58,24 @@ class BoyloveCrawler(CrawlerBase):
         for chapter_number, item in enumerate(data['list'], start=1):
             source_url = urljoin(self.SITE_INDEX, '/home/book/capterid/%s' % item['id'])
             title = item['title']
-            image_urls = [urljoin(self.SITE_INDEX, i) for i in item['imagelist'].split(',')]
+            cid = item['id']
             book.add_chapter(chapter_number=chapter_number,
                              source_url=source_url,
-                             image_urls=image_urls,
+                             cid=cid,
                              title=title)
         for tag in tags:
             book.add_tag(tag=tag, name=tag)
         return book
 
     def get_chapter_image_urls(self, citem):
-        return citem.image_urls
+        url = urljoin(self.SITE_INDEX, "/home/book/capter/id/%s" % citem.cid)
+        soup = self.get_soup(url)
+        image_urls = []
+        for div in soup.find('section', {"class": "reader-cartoon-chapter"})\
+                .find_all("div", {"class": "reader-cartoon-image loaded"}):
+            image_url = div.img.get('data-original').strip()
+            image_urls.append(urljoin(self.SITE_INDEX, image_url))
+        return image_urls
 
     def latest(self, page=1):
         url = urljoin(self.SITE_INDEX, '/home/api/getpage/tp/1-newest-%s' % (page - 1))
