@@ -1,4 +1,5 @@
 **unreleased**
+**v0.2.40**
 **v0.2.39**
 fix boylove
 
