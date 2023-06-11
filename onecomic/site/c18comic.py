@@ -118,9 +118,13 @@ class C18comicCrawler(CrawlerBase):
         i = height
         d = width
         o = d
+
+        if aid <= 220971:
+            return
         s = self.get_num(aid, l)
         r = int(i % s)
-        logger.debug('scramble_image aid=%s, scramble_id=%s, readmode=%s, speed=%s, l=%s s=%s', aid, scramble_id, readmode, speed, l, s)
+        logger.debug('scramble_image aid=%s, scramble_id=%s, readmode=%s, speed=%s, l=%s s=%s',
+            aid, scramble_id, readmode, speed, l, s)
         for m in range(s):
             c = math.floor(float(i) / s)
             g = c * m
@@ -143,7 +147,10 @@ class C18comicCrawler(CrawlerBase):
         if e >= 268850:
             n = str(e) + t
             n = ord(hashlib.md5(str(n).encode()).hexdigest()[-1])
-            n %= 10
+            if e >= 421926:
+                n %= 8
+            else:
+                n %= 10
             ret_map = {
                 0: 2,
                 1: 4,
