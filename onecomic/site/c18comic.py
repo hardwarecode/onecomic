@@ -119,12 +119,12 @@ class C18comicCrawler(CrawlerBase):
         d = width
         o = d
 
-        if aid <= 220971:
+        if int(aid) <= 220971:
             return
         s = self.get_num(aid, l)
         r = int(i % s)
         logger.debug('scramble_image aid=%s, scramble_id=%s, readmode=%s, speed=%s, l=%s s=%s',
-            aid, scramble_id, readmode, speed, l, s)
+                     aid, scramble_id, readmode, speed, l, s)
         for m in range(s):
             c = math.floor(float(i) / s)
             g = c * m
