@@ -17,15 +17,16 @@ REQUIRES_PYTHON = '>=3.6'
 # What packages are required for this module to be executed?
 REQUIRED = [
     "Pillow>=6.2.0",
-    "PyExecJS",
-    "bs4",
+    "PyExecJS==1.5.1",
+    "bs4==0.0.1",
     "jsbeautifier",
-    "lzstring",
-    "hyper",
-    "httpx",
-    "httpx-socks",
-    "pysocks",
-    "pycryptodomex"
+    "lzstring>=1.0.4",
+    "hyper>=0.7.0",
+    "httpx>=0.23.0",
+    "httpx-socks>=0.7.4",
+    "PySocks>=1.7.1",
+    "pycryptodomex>=3.18.0",
+    "chardet>=5.2.0"
 ]
 
 # What packages are optional?

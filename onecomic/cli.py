@@ -2,6 +2,7 @@ import argparse
 import os
 import logging
 import time
+import chardet
 
 from .comicbook import ComicBook
 from .crawlerbase import CrawlerBase
@@ -256,10 +257,13 @@ def download_search_all(site, name, page_str, **kwargs):
 
 
 def download_url_list(config, url_file, **kwargs):
-    with open(url_file) as f:
+    with open(url_file, 'rb') as f:
         for line in f:
-            line = line.strip()
-            if not line or line.startswith('#'):
+            if not line:
+                continue
+            r = chardet.detect(line)
+            line = line.decode(r['encoding']).strip()
+            if line.startswith('#'):
                 continue
             url = line
             site = ComicBook.get_site_by_url(url=url)

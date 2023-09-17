@@ -1,5 +1,6 @@
 import json
 import logging
+import chardet
 
 import httpx
 from httpx_socks import SyncProxyTransport
@@ -60,8 +61,11 @@ class SessionMgr(object):
 
     @classmethod
     def load_cookies(cls, site, path):
-        with open(path) as f:
-            cookies = json.load(f)
+        with open(path, 'rb') as f:
+            content = f.read()
+            r = chardet.detect(content)
+            s = content.decode(r['encoding']).strip()
+            cookies = json.loads(s)
             cls.update_cookies(site=site, cookies=cookies)
         return cls.get_session(site=site)
 
