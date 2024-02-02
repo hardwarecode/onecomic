@@ -67,7 +67,7 @@ class KuaiKanCrawler(CrawlerBase):
         return book
 
     def get_chapter_soure_url(self, cid):
-        return urljoin(self.SITE_INDEX, "/web/comic/{}/".format(cid))
+        return urljoin(self.SITE_INDEX, "/webs/comic-next/{}/".format(cid))
 
     def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
