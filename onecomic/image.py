@@ -65,7 +65,6 @@ class ImageDownloader(object):
         if self.is_image_exists(target_path):
             return target_path
         session = self.get_session()
-        headers = kwargs.pop('headers', {})
         session.headers.update(headers)
         try:
             response = session.get(image_url, timeout=self.get_timeout(), **kwargs)

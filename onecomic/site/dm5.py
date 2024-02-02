@@ -35,7 +35,7 @@ class DM5Crawler(CrawlerBase):
         return self.get_source_url(self.comicid)
 
     def get_source_url(self, comicid):
-        return urljoin(self.SITE_INDEX, "/manhua-{}".format(comicid))
+        return urljoin(self.SITE_INDEX, "/manhua-{}/".format(comicid))
 
     def get_comicbook_item(self):
         html, soup = self.get_html_and_soup(self.source_url)
@@ -66,7 +66,7 @@ class DM5Crawler(CrawlerBase):
             li_list = soup.find('ul', {'id': 'detail-list-select-1'}).find_all('li')
         except Exception:
             li_list = []
-        for chapter_number, li in enumerate(li_list, start=1):
+        for chapter_number, li in enumerate(reversed(li_list), start=1):
             href = li.a.get('href')
             cid = href.replace('/', '').replace('m', '')
             url = urljoin(self.SITE_INDEX, href)
@@ -123,6 +123,16 @@ class DM5Crawler(CrawlerBase):
                     image_url = '%s%s?cid=%s&key=%s' % (pix, i, citem.cid, key)
                     image_urls.append(image_url)
         return image_urls
+
+    def get_image_headers_list(self, chapter):
+        headers_list = []
+        for image_url in chapter.image_urls:
+            headers = {
+                'Referer': chapter.source_url,
+                'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+            }
+            headers_list.append(headers)
+        return headers_list
 
     def latest(self, page=1):
         if page > 1:
