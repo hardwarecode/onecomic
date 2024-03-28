@@ -115,7 +115,7 @@ class SessionMgr(object):
 
 class CrawlerSession(SessionMgr):
     SESSION_INSTANCE = {}
-    HTTP_20_SITE = ['webtoons', 'toomics']
+    HTTP_20_SITE = ['webtoons', 'toomics', 'bilibili']
 
 
 class ImageSession(SessionMgr):

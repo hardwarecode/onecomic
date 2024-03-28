@@ -150,11 +150,15 @@ class BilibiliCrawler(CrawlerBase):
             self.SITE_INDEX, "/mc{}/{}".format(self.comicid, cid))
 
     def get_chapter_image_urls(self, citem):
-        chapter_api_data = self.get_chapter_api_data(cid=citem.cid)
+        # chapter_api_data = self.get_chapter_api_data(cid=citem.cid)
+        response = self.send_request("POST", self.CHAPTER_API_V2, data={"ep_id": citem.cid})
+        api_data = response.json()
+        image_urls = [i['path'] for i in api_data['data']['images']]
+
         token_url = self.IMAGE_TOKEN_API
         ts = "%x" % int(time.time())
-        params = {"urls": json.dumps(chapter_api_data["pics"]), 'ts': ts}
-        response = self.send_request("POST", token_url, data=params)
+        params = {"urls": json.dumps(image_urls), 'ts': ts}
+        response = self.send_request("POST", token_url, json=params)
         data = response.json()
         image_urls = ["{}?token={}".format(i["url"], i["token"]) for i in data["data"]]
         return image_urls
