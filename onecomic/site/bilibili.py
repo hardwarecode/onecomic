@@ -141,8 +141,9 @@ class BilibiliCrawler(CrawlerBase):
             chapter_number = idx
             cid = item['id']
             title = item['title'].strip() or item.get('short_title', '')
+            is_locked = item.get('is_locked')
             url = self.get_chapter_soure_url(cid)
-            book.add_chapter(chapter_number=chapter_number, source_url=url, cid=cid, title=title)
+            book.add_chapter(chapter_number=chapter_number, source_url=url, cid=cid, title=title, is_locked=is_locked)
         return book
 
     def get_chapter_soure_url(self, cid):
@@ -150,6 +151,10 @@ class BilibiliCrawler(CrawlerBase):
             self.SITE_INDEX, "/mc{}/{}".format(self.comicid, cid))
 
     def get_chapter_image_urls(self, citem):
+        if citem.is_locked:
+            source_url = self.get_chapter_soure_url(cid=citem.cid)
+            raise ChapterNotFound(f"Please read on bilibili Manga APP. {source_url}")
+
         # chapter_api_data = self.get_chapter_api_data(cid=citem.cid)
         response = self.send_request("POST", self.CHAPTER_API_V2, data={"ep_id": citem.cid})
         api_data = response.json()
