@@ -39,7 +39,7 @@ def get_parser():
 
     parser.add_argument('--name', type=str, help="搜索的漫画名")
 
-    parser.add_argument('-c', '--chapter', type=str, default="-1",
+    parser.add_argument('-c', '--chapter', type=str, default="r1",
                         help="要下载的章节, 默认下载最新章节。如 -c 666 或者 -c 1-5,7,9-10")
 
     parser.add_argument('--worker', type=int, help="线程池数，默认开启4个线程池")
@@ -154,7 +154,7 @@ def download_main(comicbook, output_dir, ext_name=None, chapters=None,
                   receivers=None, is_send_mail=None, merge=None, merge_zip=None,
                   crawler_delay=None, transfer_webp=None):
     is_gen_pdf = is_gen_pdf or is_send_mail
-    chapter_str = chapters or '-1'
+    chapter_str = chapters or 'r1'
     chapter_numbers = parser_chapter_str(chapter_str=chapter_str,
                                          last_chapter_number=comicbook.get_last_chapter_number(ext_name),
                                          is_all=is_download_all)
