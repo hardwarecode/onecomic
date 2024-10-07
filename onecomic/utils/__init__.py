@@ -40,25 +40,34 @@ def parser_chapter_str(chapter_str, last_chapter_number=None, is_all=None):
     if is_all:
         return list(range(1, last_chapter_number + 1))
 
-    try:
-        chapter_number = int(chapter_str)
-        if chapter_number < 0:
-            chapter_number = last_chapter_number + chapter_number + 1
-        return [chapter_number, ]
-    except ValueError:
-        pass
-
     chapter_numbers = set()
     for block in chapter_str.split(','):
+        reverse = block.startswith('r')
+        block = block.lstrip('r')
         if '-' in block:
-            start, end = block.split('-', 1)
-            start, end = int(start), int(end)
+            if reverse:
+                end, start = block.split('-', 1)
+                start = last_chapter_number - int(start) + 1
+                end = last_chapter_number - int(end) + 1
+            else:
+                start, end = block.split('-', 1)
+                start, end = int(start), int(end)
+
             for number in range(start, end + 1):
                 chapter_numbers.add(number)
         else:
-            number = int(block)
-            chapter_numbers.add(number)
-    return sorted(chapter_numbers)
+
+            if reverse:
+                chapter_number = last_chapter_number - int(block) + 1
+            else:
+                chapter_number = int(block)
+                if chapter_number < 0:
+                    chapter_number = last_chapter_number + chapter_number + 1
+            chapter_numbers.add(chapter_number)
+    chapter_numbers = list(sorted(chapter_numbers))
+    logging.debug("last_chapter_number=%s chapter_numbers=%s", last_chapter_number, chapter_numbers)
+    return chapter_numbers
+
 
 
 def find_all_image(img_dir, sort_by=None):
