@@ -102,7 +102,7 @@ class CopymangaCrawler(CrawlerBase):
         contentKey = r.group(1)
         s = aes_decrypt(KEY, binascii.a2b_hex(contentKey[16:]), contentKey[:16].encode())
         res = json.loads(re.sub("[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\xff]", "", s.decode("utf-8")))
-        image_urls = [i['url'] for i in res]
+        image_urls = [i['url'].replace('.c800x.', '.c1500x.') for i in res]
         return image_urls
 
     def get_chapter_from_page(self, soup):
