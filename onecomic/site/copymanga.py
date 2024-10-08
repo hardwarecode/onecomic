@@ -98,11 +98,11 @@ class CopymangaCrawler(CrawlerBase):
 
     def get_chapter_image_urls(self, citem):
         html = self.get_html(citem.source_url)
-        r = re.search('class="imageData" contentKey="(.*?)"', html)
-        contentKey = r.group(1)
+        r = re.search(r'class="(imageData|disData)"\s+contentKey="(.*?)"', html)
+        contentKey = r.group(2)
         s = aes_decrypt(KEY, binascii.a2b_hex(contentKey[16:]), contentKey[:16].encode())
         res = json.loads(re.sub("[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\xff]", "", s.decode("utf-8")))
-        image_urls = [i['url'].replace('.c800x.', '.c1500x.') for i in res]
+        image_urls = [i['url'].replace('.c800x.', '.c1500x.').replace('.h800x.', '.h1500x.') for i in res]
         return image_urls
 
     def get_chapter_from_page(self, soup):
@@ -168,3 +168,16 @@ class CopymangaCrawler(CrawlerBase):
                               cover_image_url=cover_image_url,
                               source_url=source_url)
         return result
+
+
+class C2024mangaCrawler(CopymangaCrawler):
+
+    SITE = "2024manga"
+    SITE_INDEX = 'https://www.2024manga.com/'
+    SOURCE_NAME = "熱辣漫畫"
+    LOGIN_URL = SITE_INDEX
+    COMICID_PATTERN = re.compile(r'/comic/([_a-zA-Z0-9\-]*)/?')
+    DEFAULT_COMICID = 'cuimianliaofa'
+    DEFAULT_SEARCH_NAME = '可爱'
+    DEFAULT_TAG = ""
+    SITE_ENCODEING = 'utf-8'

@@ -47,8 +47,17 @@ def find_all_crawler():
     for file in os.listdir(os.path.join(HERE, "site")):
         if re.match(r"^[a-zA-Z].*?\.py$", file):
             importlib.import_module(".site.{}".format(file.split(".")[0]), __package__)
-    crawlers = [crawler for crawler in CrawlerBase.__subclasses__() if crawler.SITE_ENABLE]
+    crawlers = [crawler for crawler in subclasses_recursive(CrawlerBase) if crawler.SITE_ENABLE]
     return {crawler.SITE: crawler for crawler in crawlers}
+
+
+
+def subclasses_recursive(cls):
+    direct = cls.__subclasses__()
+    indirect = []
+    for subclass in direct:
+        indirect.extend(subclasses_recursive(subclass))
+    return direct + indirect
 
 
 class ComicBook(object):
