@@ -98,7 +98,7 @@ def get_parser():
     parser.add_argument('--show-tags', action='store_true', help="展示当前支持的标签")
     parser.add_argument('--tag', type=str, help="标签id或标签名")
 
-    parser.add_argument('--search', action='store_true', help="下载搜索结果的所有漫画")
+    parser.add_argument('--search', type=str, help="下载搜索结果的所有漫画")
 
     parser.add_argument('--proxy', type=str,
                         help='设置代理，如 --proxy "socks5://user:pass@host:port"')

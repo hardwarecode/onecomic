@@ -108,16 +108,28 @@ class CopymangaCrawler(CrawlerBase):
     def get_chapter_from_page(self, soup):
         result = self.new_search_result_item()
         data_list_str = soup.find('div', {'class': 'row exemptComic-box'}).get('list')
-        data_list_str = data_list_str.replace("&#x27;", '"')
-        for item in eval(data_list_str):
-            comicid = item['path_word']
-            name = item['name']
-            cover_image_url = item['cover']
-            source_url = self.get_source_url(comicid)
-            result.add_result(comicid=comicid,
-                              name=name,
-                              cover_image_url=cover_image_url,
-                              source_url=source_url)
+        if data_list_str is not None:
+            data_list_str = data_list_str.replace("&#x27;", '"')
+            for item in eval(data_list_str):
+                comicid = item['path_word']
+                name = item['name']
+                cover_image_url = item['cover']
+                source_url = self.get_source_url(comicid)
+                result.add_result(comicid=comicid,
+                                  name=name,
+                                  cover_image_url=cover_image_url,
+                                  source_url=source_url)
+        else:
+            for div in soup.find('div', {'class': 'row exemptComic-box'}).find_all('div', recursive=False):
+                href = div.a.get('href')
+                name = div.find('p', {'class': 'twoLines'}).text
+                comicid = self.get_comicid_by_url(href)
+                source_url = urljoin(self.SITE_INDEX, href)
+                cover_image_url = div.img.get('data-src')
+                result.add_result(comicid=comicid,
+                                  name=name,
+                                  cover_image_url=cover_image_url,
+                                  source_url=source_url)
         return result
 
     def latest(self, page=1):
@@ -130,10 +142,10 @@ class CopymangaCrawler(CrawlerBase):
         category = '分类列表'
         for a in soup.find('div', {'class': 'classify-right'}).find_all('a'):
             href = a.get('href')
-            r = re.search(r"/comics\?theme=(.*)", href)
+            r = re.search(r"(\?|&)theme=(.*)&?", href)
             if r:
                 tag_name = a.dd.text
-                tag_id = r.group(1)
+                tag_id = r.group(2)
                 tags.add_tag(category=category, name=tag_name, tag=tag_id)
         return tags
 
@@ -181,3 +193,33 @@ class C2024mangaCrawler(CopymangaCrawler):
     DEFAULT_SEARCH_NAME = '可爱'
     DEFAULT_TAG = ""
     SITE_ENCODEING = 'utf-8'
+    def search(self, name, page, size=None):
+        limit = 20
+        offset = (page - 1) * limit
+        url = urljoin(
+            self.SITE_INDEX,
+            "/api/v3/search/comic?offset=%s&platform=2&limit=%s&q=%s&q_type=" % (offset, limit, name)
+        )
+
+        data = self.get_json(url)
+        result = self.new_search_result_item()
+        for i in data['results']['list']:
+            comicid = i['path_word']
+            name = i['name']
+            cover_image_url = i['cover']
+            source_url = self.get_source_url(comicid)
+            result.add_result(comicid=comicid,
+                              name=name,
+                              cover_image_url=cover_image_url,
+                              source_url=source_url)
+        return result
+
+    def get_tag_result(self, tag, page=1):
+        limit = 50
+        offset = (page - 1) * limit
+        if not tag:
+            url = urljoin(self.SITE_INDEX, '/comics?type=1&offset=%s&limit=%s' % (offset, limit))
+        else:
+            url = urljoin(self.SITE_INDEX, '/comics?type=1&theme=%s&offset=%s&limit=%s' % (tag, offset, limit))
+        soup = self.get_soup(url)
+        return self.get_chapter_from_page(soup)
