@@ -72,12 +72,13 @@ class CopymangaCrawler(CrawlerBase):
             elif '狀態：' in text:
                 status = li.text.replace('狀態：', '').strip()
             elif '題材：' in text:
-                href = li.a.get('href')
-                r = re.search(r"/comics\?theme=(.*)", href)
-                if r:
-                    tag_name = li.a.text.lstrip('#')
-                    tag_id = r.group(1)
-                    tag_list.append((tag_id, tag_name))
+                if li.a:
+                    href = li.a.get('href')
+                    r = re.search(r"(\?|&)theme=(.*)&?", href)
+                    if r:
+                        tag_name = li.a.text.lstrip('#')
+                        tag_id = r.group(2)
+                        tag_list.append((tag_id, tag_name))
         book = self.new_comicbook_item(name=name,
                                        desc=desc,
                                        cover_image_url=cover_image_url,
