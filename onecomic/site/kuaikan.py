@@ -45,10 +45,11 @@ class KuaiKanCrawler(CrawlerBase):
             raise ComicbookNotFound.from_template(site=self.SITE,
                                                   comicid=self.comicid,
                                                   source_url=self.source_url)
-        name = data['topicInfo']['title']
-        author = data['topicInfo']['user']['nickname']
-        desc = data['topicInfo']['description']
-        cover_image_url = data['topicInfo']['cover_image_url']
+        topic_info = data['topicInfo']
+        name = topic_info['title']
+        author = topic_info.get('user', {}).get('nickname', '')
+        desc = topic_info.get('description', '')
+        cover_image_url = topic_info.get('cover_image_url')
         book = self.new_comicbook_item(name=name,
                                        desc=desc,
                                        cover_image_url=cover_image_url,
@@ -60,7 +61,7 @@ class KuaiKanCrawler(CrawlerBase):
             cid = c['id']
             url = self.get_chapter_soure_url(cid)
             book.add_chapter(chapter_number=chapter_number, source_url=url, title=title)
-        for tag_name in data['topicInfo']['tags']:
+        for tag_name in topic_info.get('tags', []):
             tag_id = self.get_tag_id_by_name(tag_name)
             if tag_id:
                 book.add_tag(name=tag_name, tag=tag_id)
